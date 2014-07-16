@@ -204,17 +204,30 @@ namespace sde2string
                         StringBuilder result = new StringBuilder();
                         for (int i = 0; i < segments.Count(); i++)
                         {
-                            result.Append(segments[i]);
                             if (i % 2 == 0)
                             {
-                                if (i != segments.Count() - 1) result.Append("=");
+                                if (i == segments.Count() - 1) continue;
+                                if (!options.Bracketless) result.Append("[");
+                                result.Append(segments[i]);
+                                if (!options.Bracketless) result.Append("]");
+                                result.Append("=");
                             }
                             else
+                            {
+                                result.Append(segments[i]);
                                 result.Append(";");
+                            }
                         }
                         parsed = result.ToString();
 
-                        if (options.Newline)
+                        if (options.List)
+                        {
+                            foreach (string element in parsed.Split(';').Where(e => !String.IsNullOrWhiteSpace(e)))
+                            {
+                                Console.WriteLine(element);
+                            }
+                        }
+                        else if (options.Newline)
                             Console.Write(options.Unicode ? unicode : options.Raw ? raw : parsed);
                         else
                             Console.WriteLine(options.Unicode ? unicode : options.Raw ? raw : parsed);
