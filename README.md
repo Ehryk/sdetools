@@ -49,8 +49,19 @@ Resources:
 
 Build Requirements:
 ---
-Visual Studio (Built with Visual Studio 2013)
-ESRI ArcGIS Installed (Built with ArcGIS 10.0.3)
+  - Visual Studio (Built with Visual Studio 2013)
+  - nuget
+    - Packages:
+    - [CommandLineParser](https://www.nuget.org/packages/CommandLineParser/) - Command Line Parsing
+    - [Fody](https://www.nuget.org/packages/Fody/) - .NET Assembly Weaving
+    - [Costura.Fody](https://www.nuget.org/packages/Costura.Fody/) - Making the .exe a standalone executable
+  - ESRI ArcGIS Installed (Built with ArcGIS 10.0.3)
+    - Libraries:
+    - ESRI.ArcGIS.DataSourcesGDB
+    - ESRI.ArcGIS.Framework
+    - ESRI.ArcGIS.Geodatabase
+    - ESRI.ArcGIS.System
+    - ESRI.ArcGIS.Version
 
 Contacts:
 ---
