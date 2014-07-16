@@ -32,6 +32,9 @@ namespace sde2string
         [Option('p', "pause", DefaultValue = false, HelpText = "Pause for a key press before terminating.")]
         public bool Pause { get; set; }
 
+        [Option('n', "newline", DefaultValue = false, HelpText = "Do not output the trailing newline.")]
+        public bool Newline { get; set; }
+
         [ParserState]
         public IParserState LastParserState { get; set; }
 
@@ -109,12 +112,19 @@ namespace sde2string
                                     Console.WriteLine(String.Format("[{0}]={1}", property.Key, property.Value));
                             }
                         }
+                        else if (options.Newline)
+                            Console.Write(GDBUtilities.GetConnectionStringFromSDEFile(options.InputFile, options.Bracketless));
                         else
                             Console.WriteLine(GDBUtilities.GetConnectionStringFromSDEFile(options.InputFile, options.Bracketless));
                     }
                     finally
                     {
                         GDBUtilities.ReturnESRILicense(license);
+                        if (options.Verbose)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Cyan;
+                            Console.WriteLine("License Released: {0}", licenseProductCode);
+                        }
                     }
                 }
                 else
