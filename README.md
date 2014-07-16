@@ -1,7 +1,7 @@
-sde2string v1.1
+sde2string v1.2
 ===============
 
-This Windows console application will return the Connection Properties of a passed in .sde file. By default this will be in 'Connection String' syntax; ``[Key1]=Value;[Key2]=Value;``. The ``-l`` / ``--list`` switch will list out the properties on separate lines for easier reading, and ``-b`` / ``--bracketless`` will drop the brackets; ``Key1=Value;Key2=Value;``.
+This Windows console application will return the Connection Properties of a passed in .sde file. By default this will be in 'Connection String' syntax; ``[Key1]=Value;[Key2]=Value;``. The ``-l`` / ``--list`` switch will list out the properties on separate lines for easier reading, and ``-b`` / ``--bracketless`` will drop the brackets; ``Key1=Value;Key2=Value;``. The full options are detailed below and are also available with the ``--help`` switch (or parameterless invokation).
 
 Usage:
 ---
@@ -16,9 +16,12 @@ Usage:
     - Print the Connection Properties as a List (one per line)
     - ``-b``, ``--bracketless``
     - Don't bracket the keys (Key=Value;)
+    - ``-p``, ``--pause``
+    - Pause for a key press before exiting
 
 Latest Changes:
 ---
+  - Added ``--pause`` option
   - Added ``--bracketless`` option
   - Embedded Resources into standalone .exe with Costura.Fody
   - Added ``--list`` option
@@ -27,6 +30,7 @@ Latest Changes:
 
 Release History:
 ---
+  - v1.2 2014.7.16 Adds the --pause option to leave the console window open
   - v1.1 2014.7.16 This embeds the necessary resources for a standalone .exe and adds the --bracketless option
   - v1.0 2014.7.15 This release is a functional parser to read the connection properties from a .sde file
 

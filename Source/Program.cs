@@ -29,6 +29,9 @@ namespace sde2string
         [Option('b', "bracketless", DefaultValue = false, HelpText = "Remove the brackets from the keys.")]
         public bool Bracketless { get; set; }
 
+        [Option('p', "pause", DefaultValue = false, HelpText = "Pause for a key press before terminating.")]
+        public bool Pause { get; set; }
+
         [ParserState]
         public IParserState LastParserState { get; set; }
 
@@ -52,9 +55,12 @@ namespace sde2string
             {
                 IAoInitialize license = null;
                 var options = new Options();
+                bool pause = false;
+
                 if (CommandLine.Parser.Default.ParseArgumentsStrict(args, options))
                 {
                     // Values are available here
+                    pause = options.Pause;
 #if DEBUG
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     if (options.Verbose) Console.WriteLine("DEBUG BUILD");
@@ -122,6 +128,12 @@ namespace sde2string
 #if DEBUG
                 Console.WriteLine("Press any key to continue...");
                 Console.ReadKey();
+#else
+                if (pause)
+                {
+                    Console.WriteLine("Press any key to continue...");
+                    Console.ReadKey();
+                }
 #endif
             }
             catch (Exception e)
