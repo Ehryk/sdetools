@@ -17,9 +17,9 @@ namespace sde2string
     {
         #region Connection String Helpers
 
-        public static string GetConnectionStringFromSDEFile(string path)
+        public static string GetConnectionStringFromSDEFile(string path, bool bracketless)
         {
-            return PropertySetToString(GetPropertySetFromSDEFile(path));
+            return PropertySetToString(GetPropertySetFromSDEFile(path), bracketless);
         }
 
         public static IPropertySet GetPropertySetFromSDEFile(string path)
@@ -220,7 +220,7 @@ namespace sde2string
 
         #region PropertySet Helpers
 
-        public static string PropertySetToString(IPropertySet propertySet)
+        public static string PropertySetToString(IPropertySet propertySet, bool bracketless = false)
         {
             if (propertySet == null)
                 throw new ArgumentNullException("propertySet");
@@ -237,7 +237,10 @@ namespace sde2string
             String connectionProperties = "";
             for (int i = 0; i < propertyCount; i++)
             {
-                connectionProperties = String.Format("{0}[{1}]={2};", connectionProperties, names[i], values[i]);
+                if (bracketless)
+                    connectionProperties = String.Format("{0}{1}={2};", connectionProperties, names[i], values[i]);
+                else
+                    connectionProperties = String.Format("{0}[{1}]={2};", connectionProperties, names[i], values[i]);
                 //string nameString = names[i].ToString();
                 //string valueString = values[i].ToString();
             }

@@ -26,6 +26,9 @@ namespace sde2string
         [Option('l', "list", DefaultValue = false, HelpText = "Lists each property on a single line.")]
         public bool List { get; set; }
 
+        [Option('b', "bracketless", DefaultValue = false, HelpText = "Remove the brackets from the keys.")]
+        public bool Bracketless { get; set; }
+
         [ParserState]
         public IParserState LastParserState { get; set; }
 
@@ -45,76 +48,95 @@ namespace sde2string
 
         static void Main(string[] args)
         {
-            IAoInitialize license = null;
-            var options = new Options();
-            if (CommandLine.Parser.Default.ParseArgumentsStrict(args, options))
+            try
             {
-                // Values are available here
-                #if DEBUG
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                if (options.Verbose) Console.WriteLine("DEBUG BUILD");
-                Console.ResetColor();
-                #endif
-
-                if (options.InputFile == null)
+                IAoInitialize license = null;
+                var options = new Options();
+                if (CommandLine.Parser.Default.ParseArgumentsStrict(args, options))
                 {
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.Write(options.GetUsage());
+                    // Values are available here
+#if DEBUG
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    if (options.Verbose) Console.WriteLine("DEBUG BUILD");
                     Console.ResetColor();
-                    return;
-                }
+#endif
 
-                if (!File.Exists(options.InputFile))
+                    if (options.InputFile == null)
+                    {
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.Write(options.GetUsage());
+                        Console.ResetColor();
+                        return;
+                    }
+
+                    if (!File.Exists(options.InputFile))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("File not found: {0}", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, options.InputFile));
+                        Console.ResetColor();
+                        return;
+                    }
+
+                    Console.ForegroundColor = ConsoleColor.White;
+                    if (options.Verbose) Console.WriteLine("File Found: {0}", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, options.InputFile));
+                    Console.ResetColor();
+
+                    try
+                    {
+                        license = GDBUtilities.CheckoutESRILicense(licenseProductCode);
+
+                        if (options.Verbose && license != null)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Cyan;
+                            Console.WriteLine("License Checkout Successful: {0}", licenseProductCode);
+                        }
+
+                        Console.ForegroundColor = ConsoleColor.Green;
+
+                        if (options.List)
+                        {
+                            foreach (KeyValuePair<string, object> property in GDBUtilities.PropertySetToDictionary(GDBUtilities.GetPropertySetFromSDEFile(options.InputFile)))
+                            {
+                                if (options.Bracketless)
+                                    Console.WriteLine(String.Format("{0}={1}", property.Key, property.Value));
+                                else
+                                    Console.WriteLine(String.Format("[{0}]={1}", property.Key, property.Value));
+                            }
+                        }
+                        else
+                            Console.WriteLine(GDBUtilities.GetConnectionStringFromSDEFile(options.InputFile, options.Bracketless));
+                    }
+                    finally
+                    {
+                        GDBUtilities.ReturnESRILicense(license);
+                    }
+                }
+                else
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("File not found: {0}", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, options.InputFile));
-                    Console.ResetColor();
-                    return;
+                    Console.WriteLine("Input File Argument Missing.");
                 }
 
-                Console.ForegroundColor = ConsoleColor.White;
-                if (options.Verbose) Console.WriteLine("File Found: {0}", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, options.InputFile));
                 Console.ResetColor();
 
-                try
-                {
-                    license = GDBUtilities.CheckoutESRILicense(licenseProductCode);
-
-                    if (options.Verbose && license != null)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine("License Checkout Successful: {0}", licenseProductCode);
-                    }
-
-                    Console.ForegroundColor = ConsoleColor.Green;
-
-                    if (options.List)
-                    {
-                        foreach(KeyValuePair<string, object> property in GDBUtilities.PropertySetToDictionary(GDBUtilities.GetPropertySetFromSDEFile(options.InputFile)))
-                        {
-                            Console.WriteLine(String.Format("[{0}]={1}", property.Key, property.Value));
-                        }
-                    }
-                    else
-                        Console.WriteLine(GDBUtilities.GetConnectionStringFromSDEFile(options.InputFile));
-                }
-                finally
-                {
-                    GDBUtilities.ReturnESRILicense(license);
-                }
+#if DEBUG
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
+#endif
             }
-            else
+            catch (Exception e)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Input File Argument Missing.");
+                Console.WriteLine("Exception: {0}", e.Message);
+#if DEBUG
+                Console.WriteLine();
+                Console.WriteLine("Stack Trace: {0}", e.StackTrace);
+#endif
             }
-
-            Console.ResetColor();
-
-            #if DEBUG
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
-            #endif
+            finally
+            {
+                Console.ResetColor();
+            }
         }
     }
 }
