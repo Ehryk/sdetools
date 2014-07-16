@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Text.RegularExpressions;
 
 using CommandLine;
 using CommandLine.Text;
@@ -19,6 +20,9 @@ namespace sde2string
         [ValueOption(0)]
         [Option('i', "input", Required = false, HelpText = "Input file to be processed.")]
         public string InputFile { get; set; }
+
+        [Option('c', "connect", DefaultValue = false, HelpText = "Establishes the SDE Connection and examines with ESRI libraries.")]
+        public bool Connect { get; set; }
 
         [Option('v', "verbose", DefaultValue = false, HelpText = "Prints all messages to standard output.")]
         public bool Verbose { get; set; }
@@ -100,41 +104,79 @@ namespace sde2string
                     if (options.Verbose) Console.WriteLine("File Found: {0}", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, options.InputFile));
                     Console.ResetColor();
 
-                    try
+                    if (options.Connect)
                     {
-                        license = GDBUtilities.CheckoutESRILicense(licenseProductCode);
-
-                        if (options.Verbose && license != null)
+                        //Establish the SDE Connection and Examine the Connection Properties
+                        try
                         {
-                            Console.ForegroundColor = ConsoleColor.Cyan;
-                            Console.WriteLine("License Checkout Successful: {0}", licenseProductCode);
-                        }
+                            license = GDBUtilities.CheckoutESRILicense(licenseProductCode);
 
-                        Console.ForegroundColor = ConsoleColor.Green;
-
-                        if (options.List)
-                        {
-                            foreach (KeyValuePair<string, object> property in GDBUtilities.PropertySetToDictionary(GDBUtilities.GetPropertySetFromSDEFile(options.InputFile)))
+                            if (options.Verbose && license != null)
                             {
-                                if (options.Bracketless)
-                                    Console.WriteLine(String.Format("{0}={1}", property.Key, property.Value));
-                                else
-                                    Console.WriteLine(String.Format("[{0}]={1}", property.Key, property.Value));
+                                Console.ForegroundColor = ConsoleColor.Cyan;
+                                Console.WriteLine("License Checkout Successful: {0}", licenseProductCode);
+                            }
+
+                            Console.ForegroundColor = ConsoleColor.Green;
+
+                            if (options.List)
+                            {
+                                foreach (KeyValuePair<string, object> property in GDBUtilities.PropertySetToDictionary(GDBUtilities.GetPropertySetFromSDEFile(options.InputFile)))
+                                {
+                                    if (options.Bracketless)
+                                        Console.WriteLine(String.Format("{0}={1}", property.Key, property.Value));
+                                    else
+                                        Console.WriteLine(String.Format("[{0}]={1}", property.Key, property.Value));
+                                }
+                            }
+                            else if (options.Newline)
+                                Console.Write(GDBUtilities.GetConnectionStringFromSDEFile(options.InputFile, options.Bracketless));
+                            else
+                                Console.WriteLine(GDBUtilities.GetConnectionStringFromSDEFile(options.InputFile, options.Bracketless));
+                        }
+                        finally
+                        {
+                            GDBUtilities.ReturnESRILicense(license);
+                            if (options.Verbose)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Cyan;
+                                Console.WriteLine("License Released: {0}", licenseProductCode);
                             }
                         }
-                        else if (options.Newline)
-                            Console.Write(GDBUtilities.GetConnectionStringFromSDEFile(options.InputFile, options.Bracketless));
-                        else
-                            Console.WriteLine(GDBUtilities.GetConnectionStringFromSDEFile(options.InputFile, options.Bracketless));
                     }
-                    finally
+                    else
                     {
-                        GDBUtilities.ReturnESRILicense(license);
-                        if (options.Verbose)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Cyan;
-                            Console.WriteLine("License Released: {0}", licenseProductCode);
-                        }
+                        //Examine the raw hex of the .sde
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        string contents = Encoding.UTF7.GetString(File.ReadAllBytes(options.InputFile));
+
+                        //Raw
+                        //string ascii = contents;
+
+                        //Regex
+                        string ascii = Regex.Replace(contents, @"[^\u0020-\u007F|\u0000]", string.Empty);
+
+                        //Join Spacing
+                        ascii = System.Text.RegularExpressions.Regex.Replace(ascii, @"\s+", " ");
+                        //ascii = System.Text.RegularExpressions.Regex.Replace(ascii, @"\u0000+", " ");
+
+                        //.NET
+                        //string ascii = Encoding.ASCII.GetString(
+                        //    Encoding.Convert(
+                        //        Encoding.UTF8,
+                        //        Encoding.GetEncoding(
+                        //            Encoding.ASCII.EncodingName,
+                        //            new EncoderReplacementFallback(string.Empty),
+                        //            new DecoderExceptionFallback()
+                        //            ),
+                        //        Encoding.UTF8.GetBytes(contents)
+                        //    )
+                        //);
+
+                        if (options.Newline)
+                            Console.Write(ascii);
+                        else
+                            Console.WriteLine(ascii);
                     }
                 }
                 else
