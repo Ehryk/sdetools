@@ -35,6 +35,9 @@ namespace sde2string
         [Option('n', "newline", DefaultValue = false, HelpText = "Do not output the trailing newline.")]
         public bool Newline { get; set; }
 
+        [Option("version", DefaultValue = false, HelpText = "Display Version and Exit.")]
+        public bool Version { get; set; }
+
         [ParserState]
         public IParserState LastParserState { get; set; }
 
@@ -64,11 +67,18 @@ namespace sde2string
                 {
                     // Values are available here
                     pause = options.Pause;
+
 #if DEBUG
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     if (options.Verbose) Console.WriteLine("DEBUG BUILD");
                     Console.ResetColor();
 #endif
+
+                    if (options.Version)
+                    {
+                        Console.Write("{0} v{1}", ApplicationInfo.ProductName, ApplicationInfo.Version);
+                        return;
+                    }
 
                     if (options.InputFile == null)
                     {
