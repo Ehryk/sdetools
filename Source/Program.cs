@@ -155,9 +155,6 @@ namespace sde2string
 
                         //Regex
                         string ascii = Regex.Replace(contents, @"[^\u0020-\u007F|\u0000]", string.Empty);
-
-                        //Join Spacing
-                        ascii = System.Text.RegularExpressions.Regex.Replace(ascii, @"\s+", " ");
                         //ascii = System.Text.RegularExpressions.Regex.Replace(ascii, @"\u0000+", " ");
 
                         //.NET
@@ -173,10 +170,32 @@ namespace sde2string
                         //    )
                         //);
 
+                        //Join Spacing
+                        ascii = Regex.Replace(ascii, @"[\u0000]{2,}", "|");
+                        ascii = Regex.Replace(ascii, @"[\u0000]", String.Empty);
+                        ascii = Regex.Replace(ascii, @"\s+", " ");
+
+                        //SDE Specific Parsing
+                        ascii = ascii.Substring(ascii.IndexOf("SERVER"));
+                        ascii = ascii.Replace("|0|", "|").Replace("|(|", "|");
+                        ascii = Regex.Replace(ascii, @"PASSWORD.*VERSION", "PASSWORD||VERSION");
+                        ascii = Regex.Replace(ascii, @"0\|Rev.*$", "0");
+                        string[] segments = ascii.Split('|');
+
+                        StringBuilder result = new StringBuilder();
+                        for (int i = 0; i < segments.Count(); i++)
+                        {
+                            result.Append(segments[i]);
+                            if (i % 2 == 0)
+                                result.Append("=");
+                            else
+                                result.Append(";");
+                        }
+
                         if (options.Newline)
-                            Console.Write(ascii);
+                            Console.Write(result);
                         else
-                            Console.WriteLine(ascii);
+                            Console.WriteLine(result);
                     }
                 }
                 else
