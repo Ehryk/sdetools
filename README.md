@@ -1,4 +1,4 @@
-sde2string v1.2
+sde2string v1.3
 ===============
 
 This Windows console application will return the Connection Properties of a passed in .sde file. By default this will be in 'Connection String' syntax; ``[Key1]=Value;[Key2]=Value;``. The ``-l`` / ``--list`` switch will list out the properties on separate lines for easier reading, and ``-b`` / ``--bracketless`` will drop the brackets; ``Key1=Value;Key2=Value;``. The full options are detailed below and are also available with the ``--help`` switch (or parameterless invokation).
@@ -18,9 +18,20 @@ Usage:
     - Don't bracket the keys (Key=Value;)
     - ``-p``, ``--pause``
     - Pause for a key press before exiting
+    - ``-n``, ``--newline``
+    - Don't print the trailing newline (similar to echo -n), useful for copying to the clipboard
+    - ``-c``, ``--connect``
+    - Establish a connection and read the connection properties (requires an ArcGIS ArcInfo license)
+    - ``-r``, ``--raw``
+    - Display the mildly parsed ascii
+    - ``-u``, ``--unparsed``
+    - Display the unparsed ascii (encoded from the .sde hex)
 
 Latest Changes:
 ---
+  - Added parsing related switches (``--raw``, ``--unicode``)
+  - Added direct parsing (now default)
+  - Made connection establishment a switch ``--connect`` and not the default behavior
   - Added ``--pause`` option
   - Added ``--bracketless`` option
   - Embedded Resources into standalone .exe with Costura.Fody
@@ -30,13 +41,14 @@ Latest Changes:
 
 Release History:
 ---
+  - v1.3 2014.7.17 Adds direct parsing, establishing a connection not the default
   - v1.2 2014.7.16 Adds the --pause option to leave the console window open
   - v1.1 2014.7.16 This embeds the necessary resources for a standalone .exe and adds the --bracketless option
   - v1.0 2014.7.15 This release is a functional parser to read the connection properties from a .sde file
 
 Acknowledgements:
 ---
-Thanks to Michael Juvrud for providing sample .NET ArcObjects code snippets.
+Thanks to Michael Juvrud for providing sample .NET ArcObjects code snippets and Jason Roebuck for sample .sde files.
 
 Main Contributors:
 - Eric Menze ([@Ehryk42](https://twitter.com/Ehryk42))

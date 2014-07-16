@@ -39,6 +39,12 @@ namespace sde2string
         [Option('n', "newline", DefaultValue = false, HelpText = "Do not output the trailing newline.")]
         public bool Newline { get; set; }
 
+        [Option('r', "raw", DefaultValue = false, HelpText = "Output the raw (semi-parsed) contents of the .sde file as ascii.")]
+        public bool Raw { get; set; }
+
+        [Option('u', "unparsed", DefaultValue = false, HelpText = "Output the raw (unparsed) contents of the .sde file as ascii.")]
+        public bool Unicode { get; set; }
+
         [Option("version", DefaultValue = false, HelpText = "Display Version and Exit.")]
         public bool Version { get; set; }
 
@@ -80,7 +86,10 @@ namespace sde2string
 
                     if (options.Version)
                     {
-                        Console.Write("{0} v{1}", ApplicationInfo.ProductName, ApplicationInfo.Version);
+                        if (options.Newline)
+                            Console.Write("{0} v{1}", ApplicationInfo.ProductName, ApplicationInfo.Version);
+                        else
+                            Console.WriteLine("{0} v{1}", ApplicationInfo.ProductName, ApplicationInfo.Version);
                         return;
                     }
 
@@ -148,13 +157,13 @@ namespace sde2string
                     {
                         //Examine the raw hex of the .sde
                         Console.ForegroundColor = ConsoleColor.Green;
-                        string contents = Encoding.UTF7.GetString(File.ReadAllBytes(options.InputFile));
+                        string unicode = Encoding.UTF7.GetString(File.ReadAllBytes(options.InputFile));
 
                         //Raw
                         //string ascii = contents;
 
                         //Regex
-                        string ascii = Regex.Replace(contents, @"[^\u0020-\u007F|\u0000]", string.Empty);
+                        string ascii = Regex.Replace(unicode, @"[^\u0020-\u007F|\u0000]", string.Empty);
                         //ascii = System.Text.RegularExpressions.Regex.Replace(ascii, @"\u0000+", " ");
 
                         //.NET
@@ -171,15 +180,25 @@ namespace sde2string
                         //);
 
                         //Join Spacing
-                        ascii = Regex.Replace(ascii, @"[\u0000]{2,}", "|");
+                        ascii = Regex.Replace(ascii, @"[\u0000]{3,}[\u0008][\u0000].?[\u0000]{3,}", "|");
+                        ascii = Regex.Replace(ascii, @"[\u0000]{3,}.?[\u0000]{3,}", "|");
+                        ascii = Regex.Replace(ascii, @"[\u0000]{3,}", "|");
                         ascii = Regex.Replace(ascii, @"[\u0000]", String.Empty);
                         ascii = Regex.Replace(ascii, @"\s+", " ");
 
+                        string raw = ascii;
+
                         //SDE Specific Parsing
+                        string parsed;
                         ascii = ascii.Substring(ascii.IndexOf("SERVER"));
-                        ascii = ascii.Replace("|0|", "|").Replace("|(|", "|");
-                        ascii = Regex.Replace(ascii, @"PASSWORD.*VERSION", "PASSWORD||VERSION");
-                        ascii = Regex.Replace(ascii, @"0\|Rev.*$", "0");
+                        ascii = ascii.Replace("|0|", "|").Replace("|4|", "|").Replace("|(|", "|");
+                        if (ascii.Contains("VERSION"))
+                            ascii = Regex.Replace(ascii, @"PASSWORD.*VERSION", "PASSWORD||VERSION");
+                        else
+                            ascii = Regex.Replace(ascii, @"PASSWORD.*CONNPROP", "PASSWORD||CONNPROP");
+                        ascii = Regex.Replace(ascii, @"Rev1\.0\|Rev.*$", "Rev1.0");
+                        ascii = Regex.Replace(ascii, @"Rev1\.0\|ev.*$", "Rev1.0");
+                        ascii = Regex.Replace(ascii, @"Rev1\.0\|\.0.*$", "Rev1.0");
                         string[] segments = ascii.Split('|');
 
                         StringBuilder result = new StringBuilder();
@@ -187,21 +206,24 @@ namespace sde2string
                         {
                             result.Append(segments[i]);
                             if (i % 2 == 0)
-                                result.Append("=");
+                            {
+                                if (i != segments.Count() - 1) result.Append("=");
+                            }
                             else
                                 result.Append(";");
                         }
+                        parsed = result.ToString();
 
                         if (options.Newline)
-                            Console.Write(result);
+                            Console.Write(options.Unicode ? unicode : options.Raw ? raw : parsed);
                         else
-                            Console.WriteLine(result);
+                            Console.WriteLine(options.Unicode ? unicode : options.Raw ? raw : parsed);
                     }
                 }
                 else
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Input File Argument Missing.");
+                    Console.WriteLine("Could not parse arguments.");
                 }
 
                 Console.ResetColor();
