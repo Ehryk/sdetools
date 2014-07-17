@@ -45,6 +45,9 @@ namespace sde2string
         [Option('u', "unparsed", DefaultValue = false, HelpText = "Output the raw (unparsed) contents of the .sde file as ascii.")]
         public bool Unicode { get; set; }
 
+        [Option('e', "encoding", DefaultValue = "ASCII", HelpText = "Specify the .sde encoding.")]
+        public String Encoding { get; set; }
+
         [Option("version", DefaultValue = false, HelpText = "Display Version and Exit.")]
         public bool Version { get; set; }
 
@@ -157,7 +160,7 @@ namespace sde2string
                     {
                         //Examine the raw hex of the .sde
                         Console.ForegroundColor = ConsoleColor.Green;
-                        string unicode = Encoding.UTF7.GetString(File.ReadAllBytes(options.InputFile));
+                        string unicode = Encoding.GetEncoding(options.Encoding).GetString(File.ReadAllBytes(options.InputFile));
 
                         //Raw
                         //string ascii = contents;
@@ -191,7 +194,6 @@ namespace sde2string
                         //SDE Specific Parsing
                         string parsed;
                         ascii = ascii.Substring(ascii.IndexOf("SERVER"));
-                        ascii = ascii.Replace("|0|", "|").Replace("|4|", "|").Replace("|(|", "|");
                         if (ascii.Contains("VERSION"))
                             ascii = Regex.Replace(ascii, @"PASSWORD.*VERSION", "PASSWORD||VERSION");
                         else

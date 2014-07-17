@@ -22,6 +22,9 @@ Usage:
     - Don't print the trailing newline (similar to echo -n), useful for copying to the clipboard
     - ``-c``, ``--connect``
     - Establish a connection and read the connection properties (requires an ArcGIS ArcInfo license)
+    - ``-e``, ``--encoding``
+    - Override the .sde encoding. Not recommended, and may only be useful with -u as it may alter or break parsing
+    - Options: ASCII, UTF-8, UTF-7, Unicode, UnicodeFFFE, UTF-16
     - ``-r``, ``--raw``
     - Display the mildly parsed ascii
     - ``-u``, ``--unparsed``
@@ -29,6 +32,7 @@ Usage:
 
 Latest Changes:
 ---
+  - Added encoding override (``--encoding=UTF-8``, ``-e Unicode``)
   - Added parsing related switches (``--raw``, ``--unicode``)
   - Added direct parsing (now default)
   - Made connection establishment a switch ``--connect`` and not the default behavior
