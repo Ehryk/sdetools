@@ -45,7 +45,7 @@ namespace sde2string
         [Option('u', "unparsed", DefaultValue = false, HelpText = "Output the raw (unparsed) contents of the .sde file as ascii.")]
         public bool Unicode { get; set; }
 
-        [Option('e', "encoding", DefaultValue = "ASCII", HelpText = "Specify the .sde encoding.")]
+        [Option('e', "encoding", DefaultValue = "ASCII", HelpText = "Specify the .sde encoding. May cause errors without -u (unparsed).")]
         public String Encoding { get; set; }
 
         [Option("version", DefaultValue = false, HelpText = "Display Version and Exit.")]
