@@ -66,7 +66,7 @@ namespace sde2string
 
     class Program
     {
-        private static esriLicenseProductCode licenseProductCode = esriLicenseProductCode.esriLicenseProductCodeArcInfo;
+        private static esriLicenseProductCode licenseProductCode = esriLicenseProductCode.esriLicenseProductCodeBasic;
 
         static void Main(string[] args)
         {
