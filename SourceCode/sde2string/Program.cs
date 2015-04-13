@@ -14,67 +14,25 @@ using ESRI.ArcGIS.Geodatabase;
 
 namespace sde2string
 {
-    // Class to receive parsed values
-    class Options
+    public class Program
     {
-        [ValueOption(0)]
-        [Option('i', "input", Required = false, HelpText = "Input file to be processed.")]
-        public string InputFile { get; set; }
-
-        [Option('c', "connect", DefaultValue = false, HelpText = "Establishes the SDE Connection and examines with ESRI libraries.")]
-        public bool Connect { get; set; }
-
-        [Option('v', "verbose", DefaultValue = false, HelpText = "Prints all messages to standard output.")]
-        public bool Verbose { get; set; }
-
-        [Option('l', "list", DefaultValue = false, HelpText = "Lists each property on a single line.")]
-        public bool List { get; set; }
-
-        [Option('b', "bracketless", DefaultValue = false, HelpText = "Remove the brackets from the keys.")]
-        public bool Bracketless { get; set; }
-
-        [Option('p', "pause", DefaultValue = false, HelpText = "Pause for a key press before terminating.")]
-        public bool Pause { get; set; }
-
-        [Option('n', "newline", DefaultValue = false, HelpText = "Do not output the trailing newline.")]
-        public bool Newline { get; set; }
-
-        [Option('r', "raw", DefaultValue = false, HelpText = "Output the raw (semi-parsed) contents of the .sde file as ascii.")]
-        public bool Raw { get; set; }
-
-        [Option('u', "unparsed", DefaultValue = false, HelpText = "Output the raw (unparsed) contents of the .sde file as ascii.")]
-        public bool Unicode { get; set; }
-
-        [Option('e', "encoding", DefaultValue = "ASCII", HelpText = "Specify the .sde encoding. May cause errors without -u (unparsed).")]
-        public String Encoding { get; set; }
-
-        [Option("version", DefaultValue = false, HelpText = "Display Version and Exit.")]
-        public bool Version { get; set; }
-
-        [ParserState]
-        public IParserState LastParserState { get; set; }
-
-        [HelpOption]
-        public string GetUsage()
-        {
-            string helpText = HelpText.AutoBuild(this,
-              (HelpText current) => HelpText.DefaultParsingErrorsHandler(this, current));
-            helpText += "  Example: sde2string Sample.sde -lv \r\n";
-            return helpText;
-        }
-    }
-
-    class Program
-    {
+        public const int SUCCESS = 0;
+        public const int FAILURE_UNSPECIFIED = 1;
+        public const int FAILURE_ARGUMENTS = 2;
+        public const int FAILURE_NO_INPUT = 3;
+        public const int FAILURE_FILE_NOT_FOUND = 4;
+        
         private static esriLicenseProductCode licenseProductCode = esriLicenseProductCode.esriLicenseProductCodeBasic;
 
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
+            int retCode = FAILURE_UNSPECIFIED;
+            bool pause = false;
+
             try
             {
                 IAoInitialize license = null;
                 var options = new Options();
-                bool pause = false;
 
                 if (CommandLine.Parser.Default.ParseArgumentsStrict(args, options))
                 {
@@ -93,7 +51,7 @@ namespace sde2string
                             Console.Write("{0} v{1}", ApplicationInfo.ProductName, ApplicationInfo.Version);
                         else
                             Console.WriteLine("{0} v{1}", ApplicationInfo.ProductName, ApplicationInfo.Version);
-                        return;
+                        return SUCCESS;
                     }
 
                     if (options.InputFile == null)
@@ -101,7 +59,7 @@ namespace sde2string
                         Console.ForegroundColor = ConsoleColor.White;
                         Console.Write(options.GetUsage());
                         Console.ResetColor();
-                        return;
+                        return FAILURE_NO_INPUT;
                     }
 
                     if (!File.Exists(options.InputFile))
@@ -109,7 +67,7 @@ namespace sde2string
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("File not found: {0}", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, options.InputFile));
                         Console.ResetColor();
-                        return;
+                        return FAILURE_FILE_NOT_FOUND;
                     }
 
                     Console.ForegroundColor = ConsoleColor.White;
@@ -145,6 +103,8 @@ namespace sde2string
                                 Console.Write(GDBUtilities.GetConnectionStringFromSDEFile(options.InputFile, options.Bracketless));
                             else
                                 Console.WriteLine(GDBUtilities.GetConnectionStringFromSDEFile(options.InputFile, options.Bracketless));
+
+                            retCode = SUCCESS;
                         }
                         finally
                         {
@@ -160,16 +120,12 @@ namespace sde2string
                     {
                         //Examine the raw hex of the .sde
                         Console.ForegroundColor = ConsoleColor.Green;
-                        string unicode = Encoding.GetEncoding(options.Encoding).GetString(File.ReadAllBytes(options.InputFile));
+                        string encoded = Encodings.GetEncoding(options.Encoding).GetString(File.ReadAllBytes(options.InputFile));
 
-                        //Raw
-                        //string ascii = contents;
+                        //Regex Conversion
+                        string ascii = Regex.Replace(encoded, @"[^\u0020-\u007F|\u0000]", string.Empty);
 
-                        //Regex
-                        string ascii = Regex.Replace(unicode, @"[^\u0020-\u007F|\u0000]", string.Empty);
-                        //ascii = System.Text.RegularExpressions.Regex.Replace(ascii, @"\u0000+", " ");
-
-                        //.NET
+                        //.NET Conversion
                         //string ascii = Encoding.ASCII.GetString(
                         //    Encoding.Convert(
                         //        Encoding.UTF8,
@@ -230,9 +186,9 @@ namespace sde2string
                             }
                         }
                         else if (options.Newline)
-                            Console.Write(options.Unicode ? unicode : options.Raw ? raw : parsed);
+                            Console.Write(options.Unicode ? encoded : options.Raw ? raw : parsed);
                         else
-                            Console.WriteLine(options.Unicode ? unicode : options.Raw ? raw : parsed);
+                            Console.WriteLine(options.Unicode ? encoded : options.Raw ? raw : parsed);
                     }
                 }
                 else
@@ -240,19 +196,6 @@ namespace sde2string
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Could not parse arguments.");
                 }
-
-                Console.ResetColor();
-
-#if DEBUG
-                Console.WriteLine("Press any key to continue...");
-                Console.ReadKey();
-#else
-                if (pause)
-                {
-                    Console.WriteLine("Press any key to continue...");
-                    Console.ReadKey();
-                }
-#endif
             }
             catch (Exception e)
             {
@@ -265,8 +208,17 @@ namespace sde2string
             }
             finally
             {
+                if (pause)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Press any key to continue...");
+                    Console.ReadKey();
+                }
+
                 Console.ResetColor();
             }
+
+            return retCode;
         }
     }
 }

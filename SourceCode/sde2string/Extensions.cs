@@ -9,6 +9,34 @@ namespace sde2string
     public static class StringExtensions
     {
         /// <summary>
+        /// Convert Hash bytes to Hexadecimal String format. Defaults to UTF8 Encoding.
+        /// </summary>
+        public static byte[] ToBytes(this string input, Encoding encoding = null)
+        {
+            encoding = encoding ?? new UTF8Encoding();
+            return encoding.GetBytes(input);
+        }
+
+        /// <summary>
+        /// Convert Hash bytes to Hexadecimal String format 
+        /// </summary>
+        public static bool EqualsIgnoreCase(this string input, string other, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
+        {
+            return input.Equals(other, comparison);
+        }
+
+        /// <summary>
+        /// Remove non-alphanumeric characters from a string (and optionally whitespace as well)
+        /// </summary>
+        public static string ToAlphanumeric(this string input, bool allowWhiteSpace = false)
+        {
+            if (allowWhiteSpace)
+                return new string(Array.FindAll(input.ToCharArray(), (c => (char.IsLetterOrDigit(c) || char.IsWhiteSpace(c)))));
+
+            return new string(Array.FindAll(input.ToCharArray(), (c => (char.IsLetterOrDigit(c)))));
+        }
+
+        /// <summary>
         /// Performs a given type of string comparison contains
         /// </summary>
         public static bool Contains(this string source, string toCheck, StringComparison comp)
@@ -67,6 +95,21 @@ namespace sde2string
 
     public static class ObjectExtensions
     {
+        /// <summary>
+        /// Convert Hash bytes to Hexadecimal String format 
+        /// </summary>
+        public static string GetString(this byte[] hashBytes, bool uppercase = true)
+        {
+            StringBuilder hashString = new StringBuilder();
+
+            foreach (byte b in hashBytes)
+            {
+                hashString.Append(b.ToString("x2"));
+            }
+
+            return uppercase ? hashString.ToString().ToUpper() : hashString.ToString();
+        }
+
         public static int ToInt(this object o)
         {
             return ToNullableInt(o) ?? -1;
@@ -120,7 +163,7 @@ namespace sde2string
         }
     }
 
-    static public class ApplicationInfo
+    public static class ApplicationInfo
     {
         public static Version Version { get { return Assembly.GetCallingAssembly().GetName().Version; } }
 
