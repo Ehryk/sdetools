@@ -52,9 +52,9 @@ namespace sde2string
             return source.IndexOf(toCheck, StringComparison.CurrentCultureIgnoreCase) >= 0;
         }
 
-        public static int ToInt(this string s)
+        public static int ToInt(this string s, int fallback = -1)
         {
-            return ToNullableInt(s) ?? -1;
+            return ToNullableInt(s) ?? fallback;
         }
         public static int? ToNullableInt(this string s)
         {
@@ -62,9 +62,9 @@ namespace sde2string
             return int.TryParse(s, out i) ? i : (int?)null;
         }
 
-        public static decimal ToDecimal(this string o)
+        public static decimal ToDecimal(this string o, decimal fallback = 0)
         {
-            return ToNullableDecimal(o) ?? 0;
+            return ToNullableDecimal(o) ?? fallback;
         }
         public static decimal? ToNullableDecimal(this string o)
         {
@@ -82,9 +82,9 @@ namespace sde2string
             return DateTime.TryParse(s, out d) ? d : (DateTime?)null;
         }
 
-        public static bool ToBoolean(this string o)
+        public static bool ToBoolean(this string o, bool fallback = false)
         {
-            return ToNullableBoolean(o) ?? false;
+            return ToNullableBoolean(o) ?? fallback;
         }
         public static bool? ToNullableBoolean(this string o)
         {
@@ -110,9 +110,9 @@ namespace sde2string
             return uppercase ? hashString.ToString().ToUpper() : hashString.ToString();
         }
 
-        public static int ToInt(this object o)
+        public static int ToInt(this object o, int fallback = -1)
         {
-            return ToNullableInt(o) ?? -1;
+            return ToNullableInt(o) ?? fallback;
         }
         public static int? ToNullableInt(this object o)
         {
@@ -123,9 +123,9 @@ namespace sde2string
             return int.TryParse(o.ToString(), out i) ? i : (int?)null;
         }
 
-        public static decimal ToDecimal(this object o)
+        public static decimal ToDecimal(this object o, decimal fallback = 0)
         {
-            return ToNullableDecimal(o) ?? 0;
+            return ToNullableDecimal(o) ?? fallback;
         }
         public static decimal? ToNullableDecimal(this object o)
         {
@@ -149,9 +149,9 @@ namespace sde2string
             return DateTime.TryParse(o.ToString(), out d) ? d : (DateTime?)null;
         }
 
-        public static bool ToBoolean(this object o)
+        public static bool ToBoolean(this object o, bool fallback = false)
         {
-            return ToNullableBoolean(o) ?? false;
+            return ToNullableBoolean(o) ?? fallback;
         }
         public static bool? ToNullableBoolean(this object o)
         {
