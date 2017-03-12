@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Core.Extensions;
 
 namespace sde2string
 {

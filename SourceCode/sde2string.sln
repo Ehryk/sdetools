@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sde2string", "sde2string/sde2string.csproj", "{DC87BC95-88FB-4734-A08C-B883B2CF01A2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sde2string", "sde2string\sde2string.csproj", "{DC87BC95-88FB-4734-A08C-B883B2CF01A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{AC6A3AAC-B7D4-4AB8-8650-A6B7594C5E36}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{DC87BC95-88FB-4734-A08C-B883B2CF01A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC87BC95-88FB-4734-A08C-B883B2CF01A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC87BC95-88FB-4734-A08C-B883B2CF01A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC6A3AAC-B7D4-4AB8-8650-A6B7594C5E36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC6A3AAC-B7D4-4AB8-8650-A6B7594C5E36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC6A3AAC-B7D4-4AB8-8650-A6B7594C5E36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC6A3AAC-B7D4-4AB8-8650-A6B7594C5E36}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -2,15 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 using System.Text.RegularExpressions;
-
 using CommandLine;
-using CommandLine.Text;
-
-using ESRI.ArcGIS.esriSystem;
-using ESRI.ArcGIS.Geodatabase;
+using Core.Extensions;
+using Core.ArcObjects;
 
 namespace sde2string
 {
@@ -22,8 +18,6 @@ namespace sde2string
         public const int FAILURE_NO_INPUT = 3;
         public const int FAILURE_FILE_NOT_FOUND = 4;
         
-        private static esriLicenseProductCode licenseProductCode = esriLicenseProductCode.esriLicenseProductCodeBasic;
-
         static int Main(string[] args)
         {
             int retCode = FAILURE_UNSPECIFIED;
@@ -31,10 +25,9 @@ namespace sde2string
 
             try
             {
-                IAoInitialize license = null;
                 var options = new Options();
 
-                if (CommandLine.Parser.Default.ParseArgumentsStrict(args, options))
+                if (Parser.Default.ParseArgumentsStrict(args, options))
                 {
                     // Values are available here
                     pause = options.Pause;
@@ -79,19 +72,21 @@ namespace sde2string
                         //Establish the SDE Connection and Examine the Connection Properties
                         try
                         {
-                            license = GDBUtilities.CheckoutESRILicense(licenseProductCode);
+                            //Checkout a license
+                            LicenseHelper.GetArcGISLicense_Basic();
 
-                            if (options.Verbose && license != null)
+                            if (options.Verbose)
                             {
                                 Console.ForegroundColor = ConsoleColor.Cyan;
-                                Console.WriteLine("License Checkout Successful: {0}", licenseProductCode);
+                                Console.WriteLine("ESRI License Checkout Successful");
+                                Console.ResetColor();
                             }
 
                             Console.ForegroundColor = ConsoleColor.Green;
 
                             if (options.List)
                             {
-                                foreach (KeyValuePair<string, object> property in GDBUtilities.PropertySetToDictionary(GDBUtilities.GetPropertySetFromSDEFile(options.InputFile)))
+                                foreach (KeyValuePair<string, string> property in SDEFileHelper.GetDictionaryFromSDEFile(options.InputFile))
                                 {
                                     if (options.Bracketless)
                                         Console.WriteLine(String.Format("{0}={1}", property.Key, property.Value));
@@ -100,19 +95,29 @@ namespace sde2string
                                 }
                             }
                             else if (options.Newline)
-                                Console.Write(GDBUtilities.GetConnectionStringFromSDEFile(options.InputFile, options.Bracketless));
+                                Console.Write(SDEFileHelper.GetConnectionStringFromSDEFile(options.InputFile, options.Bracketless));
                             else
-                                Console.WriteLine(GDBUtilities.GetConnectionStringFromSDEFile(options.InputFile, options.Bracketless));
+                                Console.WriteLine(SDEFileHelper.GetConnectionStringFromSDEFile(options.InputFile, options.Bracketless));
 
                             retCode = SUCCESS;
                         }
+                        catch (Exception e)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("Unable to establish a connection: {0}", e.Message);
+#if DEBUG
+                            Console.WriteLine();
+                            Console.WriteLine("Stack Trace: {0}", e.StackTrace);
+#endif
+                        }
                         finally
                         {
-                            GDBUtilities.ReturnESRILicense(license);
+                            LicenseHelper.ReleaseLicenses();
+
                             if (options.Verbose)
                             {
                                 Console.ForegroundColor = ConsoleColor.Cyan;
-                                Console.WriteLine("License Released: {0}", licenseProductCode);
+                                Console.WriteLine("ESRI License Released");
                             }
                         }
                     }
