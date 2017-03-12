@@ -53,6 +53,7 @@ namespace Core.Extensions
         {
             return ToNullableInt(s) ?? fallback;
         }
+
         public static int? ToNullableInt(this string s)
         {
             return int.TryParse(s, out int i) ? i : (int?)null;
@@ -62,6 +63,7 @@ namespace Core.Extensions
         {
             return ToNullableDecimal(o) ?? fallback;
         }
+
         public static decimal? ToNullableDecimal(this string o)
         {
             return Decimal.TryParse(o, out decimal d) ? d : (decimal?)null;
@@ -71,6 +73,7 @@ namespace Core.Extensions
         {
             return ToNullableDateTime(s) ?? DateTime.MinValue;
         }
+
         public static DateTime? ToNullableDateTime(this string s)
         {
             return DateTime.TryParse(s, out DateTime d) ? d : (DateTime?)null;
@@ -80,6 +83,7 @@ namespace Core.Extensions
         {
             return ToNullableBoolean(o) ?? fallback;
         }
+
         public static bool? ToNullableBoolean(this string o)
         {
             return Boolean.TryParse(o, out bool b) ? b : (bool?)null;

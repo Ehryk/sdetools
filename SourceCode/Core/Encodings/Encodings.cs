@@ -2,7 +2,7 @@
 using System.Text;
 using Core.Extensions;
 
-namespace sde2string
+namespace Core.Encodings
 {
     public class Encodings
     {

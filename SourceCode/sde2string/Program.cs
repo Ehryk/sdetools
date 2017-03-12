@@ -5,7 +5,8 @@ using System.Text;
 using System.IO;
 using System.Text.RegularExpressions;
 using CommandLine;
-using Core.Extensions;
+using Core.ApplicationInfo;
+using Core.Encodings;
 using Core.ArcObjects;
 
 namespace sde2string

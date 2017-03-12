@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Core.Extensions
+namespace Core.ApplicationInfo
 {
     public static class ApplicationInfo
     {

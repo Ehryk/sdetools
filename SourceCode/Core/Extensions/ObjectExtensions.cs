@@ -19,11 +19,12 @@ namespace Core.Extensions
 
             return uppercase ? hashString.ToString().ToUpper() : hashString.ToString();
         }
-
+        
         public static int ToInt(this object o, int fallback = -1)
         {
             return ToNullableInt(o) ?? fallback;
         }
+
         public static int? ToNullableInt(this object o)
         {
             if (o is int)
@@ -36,6 +37,7 @@ namespace Core.Extensions
         {
             return ToNullableDecimal(o) ?? fallback;
         }
+
         public static decimal? ToNullableDecimal(this object o)
         {
             if (o is decimal)
@@ -48,6 +50,7 @@ namespace Core.Extensions
         {
             return ToNullableDateTime(o) ?? DateTime.MinValue;
         }
+
         public static DateTime? ToNullableDateTime(this object o)
         {
             if (o is DateTime)
@@ -60,6 +63,7 @@ namespace Core.Extensions
         {
             return ToNullableBoolean(o) ?? fallback;
         }
+
         public static bool? ToNullableBoolean(this object o)
         {
             if (o is bool)
