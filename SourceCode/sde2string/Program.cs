@@ -18,7 +18,8 @@ namespace sde2string
         public const int FAILURE_ARGUMENTS = 2;
         public const int FAILURE_NO_INPUT = 3;
         public const int FAILURE_FILE_NOT_FOUND = 4;
-        
+        public const int FAILURE_CONNECTION = 5;
+
         static int Main(string[] args)
         {
             int retCode = FAILURE_UNSPECIFIED;
@@ -110,6 +111,7 @@ namespace sde2string
                             Console.WriteLine();
                             Console.WriteLine("Stack Trace: {0}", e.StackTrace);
 #endif
+                            retCode = FAILURE_CONNECTION;
                         }
                         finally
                         {
