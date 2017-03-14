@@ -7,6 +7,32 @@ namespace Core.ArcObjects
 {
     public static class ModelNameHelper
     {
+        #region IObjectClass Retrieval
+
+        public static IObjectClass GetObjectClass(this IWorkspace pWorkspace, string pName)
+        {
+            if (pWorkspace is null)
+                throw new ArgumentException("pWorkspace");
+
+            IFeatureWorkspace featureWorkspace = (IFeatureWorkspace)pWorkspace;
+            IFeatureClass featureClass = featureWorkspace.OpenFeatureClass(pName);
+            return featureClass;
+        }
+
+        public static IField GetField(this IObjectClass pObjectClass, string pName)
+        {
+            if (pObjectClass is null)
+                throw new ArgumentException("pObjectClass");
+
+            int index = pObjectClass.FindField(pName);
+            if (index < 0)
+                return null;
+
+            return pObjectClass.Fields.Field[index];
+        }
+
+        #endregion
+
         #region Class Model Names
 
         public static bool AddClassModelName(this IObjectClass pClass, string pModelName)

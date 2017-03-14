@@ -8,6 +8,7 @@ using CommandLine;
 using Core.ApplicationInfo;
 using Core.Encodings;
 using Core.ArcObjects;
+using ESRI.ArcGIS.Geodatabase;
 
 namespace gdbconfig
 {
@@ -18,7 +19,9 @@ namespace gdbconfig
         public const int FAILURE_ARGUMENTS = 2;
         public const int FAILURE_NO_INPUT = 3;
         public const int FAILURE_FILE_NOT_FOUND = 4;
-        public const int FAILURE_CONNECTION = 5;
+        public const int FAILURE_LICENSE_CHECKOUT = 5;
+        public const int FAILURE_CONNECTION = 6;
+        public const int FAILURE_EXECUTING = 7;
 
         static int Main(string[] args)
         {
@@ -66,45 +69,158 @@ namespace gdbconfig
                     }
 
                     Console.ForegroundColor = ConsoleColor.White;
-                    if (options.Verbose) Console.WriteLine("File Found: {0}", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, options.InputSDEFile));
+                    if (options.Verbose)
+                        Console.WriteLine("File Found: {0}", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, options.InputSDEFile));
                     Console.ResetColor();
+
+                    bool commandSuccess = false;
                     
                     //Establish the SDE Connection and Examine the Connection Properties
                     try
                     {
-                        //Checkout a license
-                        LicenseHelper.GetArcGISLicense_Basic();
+                        retCode = FAILURE_LICENSE_CHECKOUT;
 
-                        if (options.Verbose)
+                        //Checkout appropriate license(s)
+                        if (options.EsriLicenseRequired)
                         {
-                            Console.ForegroundColor = ConsoleColor.Cyan;
-                            Console.WriteLine("ESRI License Checkout Successful");
-                            Console.ResetColor();
+                            LicenseHelper.GetArcGISLicense_Basic();
+
+                            if (options.Verbose)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Cyan;
+                                Console.WriteLine("ESRI License Checkout Successful");
+                                Console.ResetColor();
+                            }
+                        }
+                        if (options.ArcFMLicenseRequired)
+                        {
+                            LicenseHelper.GetArcFMLicense_ArcFM();
+                            if (options.Verbose)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Cyan;
+
+                                Console.WriteLine("ArcFM License Checkout Successful");
+                                Console.ResetColor();
+                            }
                         }
 
+                        retCode = FAILURE_CONNECTION;
+                        
                         Console.ForegroundColor = ConsoleColor.Green;
 
-                        //if (options.List)
-                        //{
-                        //    foreach (KeyValuePair<string, string> property in SDEFileHelper.GetDictionaryFromSDEFile(options.InputFile))
-                        //    {
-                        //        if (options.Bracketless)
-                        //            Console.WriteLine(String.Format("{0}={1}", property.Key, property.Value));
-                        //        else
-                        //            Console.WriteLine(String.Format("[{0}]={1}", property.Key, property.Value));
-                        //    }
-                        //}
-                        //else if (options.Newline)
-                        //    Console.Write(SDEFileHelper.GetConnectionStringFromSDEFile(options.InputFile, options.Bracketless));
-                        //else
-                        //    Console.WriteLine(SDEFileHelper.GetConnectionStringFromSDEFile(options.InputFile, options.Bracketless));
+                        IWorkspace workspace = SDEFileHelper.GetWorkspaceFromSDEFile(options.InputSDEFile);
 
-                        retCode = SUCCESS;
+                        retCode = FAILURE_EXECUTING;
+
+                        if (options.AddDomain)
+                        {
+                            var domainName = options.Parameter1;
+                            var code = options.Parameter2;
+                            var name = options.Parameter3 ?? options.Parameter2;
+
+                            Console.WriteLine("Adding Domain (Code|Name) ({0} | {1}) to {2}", code, name, domainName);
+
+                            ICodedValueDomain domain = DomainHelper.GetCodedValueDomain(workspace, domainName);
+                            commandSuccess = domain.AddCodedValue(code, name);
+                        }
+                        else if (options.OrderDomain)
+                        {
+                            var domainName = options.Parameter1;
+                            var orderBy = options.Parameter2 ?? "CODE";
+                            var direction = options.Parameter3 ?? "ASC";
+
+                            Console.WriteLine("Ordering Domain {0} by {1} {2}", domainName, orderBy, direction);
+
+                            ICodedValueDomain domain = DomainHelper.GetCodedValueDomain(workspace, domainName);
+
+                            throw new NotImplementedException("Domain Ordering not yet implemented");
+                            //commandSuccess = domain.OrderDomain(domainName, orderBy, direction);
+                        }
+                        else if (options.RemoveDomain)
+                        {
+                            var domainName = options.Parameter1;
+                            var code = options.Parameter2;
+
+                            Console.WriteLine("Removing Domain (CODE) ({0}) from {1}", code, domainName);
+
+                            ICodedValueDomain domain = DomainHelper.GetCodedValueDomain(workspace, domainName);
+                            commandSuccess = domain.RemoveCodedValue(code);
+                        }
+                        else if (options.AddClassModelName)
+                        {
+                            var className = options.Parameter1;
+                            var modelName = options.Parameter2;
+
+                            Console.WriteLine("Adding Class Model Name {0} to {1}", modelName, className);
+
+                            IObjectClass objectClass = workspace.GetObjectClass(className);
+
+                            commandSuccess = objectClass.AddClassModelName(modelName);
+                        }
+                        else if (options.RemoveClassModelName)
+                        {
+                            var className = options.Parameter1;
+                            var modelName = options.Parameter2;
+
+                            Console.WriteLine("Adding Class Model Name {0} to {1}", modelName, className);
+
+                            IObjectClass objectClass = workspace.GetObjectClass(className);
+
+                            commandSuccess = objectClass.RemoveClassModelName(modelName);
+                        }
+                        else if (options.AddFieldModelName)
+                        {
+                            var className = options.Parameter1;
+                            var fieldName = options.Parameter2;
+                            var modelName = options.Parameter3;
+                            
+                            Console.WriteLine("Adding Field Model Name {0} to {1}.{2}", modelName, className, fieldName);
+
+                            IObjectClass objectClass = workspace.GetObjectClass(className);
+                            IField field = objectClass.GetField(fieldName);
+
+                            commandSuccess = objectClass.AddFieldModelName(field, modelName);
+                        }
+                        else if (options.RemoveFieldModelName)
+                        {
+                            var className = options.Parameter1;
+                            var fieldName = options.Parameter2;
+                            var modelName = options.Parameter3;
+                            
+                            Console.WriteLine("Removing Field Model Name {0} from {1}.{2}", modelName, className, fieldName);
+
+                            IObjectClass objectClass = workspace.GetObjectClass(className);
+                            IField field = objectClass.GetField(fieldName);
+
+                            commandSuccess = objectClass.RemoveFieldModelName(field, modelName);
+                        }
+
+                        Console.WriteLine();
+                        Console.WriteLine("Command Result: {0}", commandSuccess ? "Success" : "Failure");
+                        
+                        retCode = commandSuccess ? SUCCESS : FAILURE_EXECUTING;
                     }
                     catch (Exception e)
                     {
+                        string exceptionType = "Exception";
+
+                        switch (retCode)
+                        {
+                            case FAILURE_LICENSE_CHECKOUT:
+                                exceptionType = "License Exception";
+                                break;
+
+                            case FAILURE_CONNECTION:
+                                exceptionType = "Connection Exception";
+                                break;
+
+                            case FAILURE_EXECUTING:
+                                exceptionType = "Command Exception";
+                                break;
+                        }
+
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Unable to establish a connection: {0}", e.Message);
+                        Console.WriteLine("{0}: {1}", exceptionType, e.Message);
 #if DEBUG
                         Console.WriteLine();
                         Console.WriteLine("Stack Trace: {0}", e.StackTrace);
@@ -117,7 +233,7 @@ namespace gdbconfig
                         if (options.Verbose)
                         {
                             Console.ForegroundColor = ConsoleColor.Cyan;
-                            Console.WriteLine("ESRI License Released");
+                            Console.WriteLine("License(s) Released");
                         }
                     }
                 }

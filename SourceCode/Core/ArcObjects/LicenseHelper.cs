@@ -23,7 +23,16 @@ namespace Core.ArcObjects
         /// <summary>
         ///  Attempts to checkout an ArcEditor and ArcFM license and returns true if successful.
         /// </summary>
-        public static  bool GetLicenses(esriLicenseProductCode pESRIProductCode = esriLicenseProductCode.esriLicenseProductCodeAdvanced, mmLicensedProductCode pArcFMProductCode = mmLicensedProductCode.mmLPArcFM)
+        public static bool GetLicenses()
+        {
+            RuntimeManager.Bind(ProductCode.Desktop);
+            return (GetArcGISLicense() && GetArcFMLicense());
+        }
+
+        /// <summary>
+        ///  Attempts to checkout an ArcEditor and ArcFM license and returns true if successful.
+        /// </summary>
+        public static bool GetLicenses(esriLicenseProductCode pESRIProductCode = esriLicenseProductCode.esriLicenseProductCodeAdvanced, mmLicensedProductCode pArcFMProductCode = mmLicensedProductCode.mmLPArcFM)
         {
             RuntimeManager.Bind(ProductCode.Desktop);
             return (GetArcGISLicense(pESRIProductCode) && GetArcFMLicense(pArcFMProductCode));
@@ -113,6 +122,24 @@ namespace Core.ArcObjects
 
         #endregion
 
+        #region ArcFM License Checkout
+
+        /// <summary>
+        ///  Attempts to checkout an ESRI Advanced license and returns true if successful.
+        /// </summary>
+        public static bool GetArcFMLicense_ArcFM()
+        {
+            return GetArcFMLicense(mmLicensedProductCode.mmLPArcFM);
+        }
+
+        /// <summary>
+        ///  Attempts to checkout an ESRI Advanced license and returns true if successful.
+        /// </summary>
+        public static bool GetArcFMLicense_Designer()
+        {
+            return GetArcFMLicense(mmLicensedProductCode.mmLPDesigner);
+        }
+
         /// <summary>
         /// Attempts to checkout a license for the specified Miner & Miner product and returns true if successful.
         /// </summary>
@@ -161,6 +188,10 @@ namespace Core.ArcObjects
             }
         }
 
+        #endregion
+
+        #region License Releasing
+
         /// <summary>
         /// Releases ArcGIS and ArcFM licenses.
         /// </summary>
@@ -172,5 +203,7 @@ namespace Core.ArcObjects
             _MMAppInit?.Shutdown();
             _AoInitialize?.Shutdown();
         }
+
+        #endregion
     }
 }

@@ -53,10 +53,6 @@ namespace gdbconfig
         [Option("p3", Required = false, HelpText = "Parameter 3")]
         public string Parameter3 { get; set; }
 
-        [ValueOption(4)]
-        [Option("p4", Required = false, HelpText = "Parameter 4")]
-        public string Parameter4 { get; set; }
-
         #endregion
 
         #region Modifiers
@@ -75,6 +71,22 @@ namespace gdbconfig
 
         #endregion
 
+        #region Calculated
+
+        public bool EsriLicenseRequired
+        {
+            get { return AddDomain || OrderDomain || RemoveDomain || AddClassModelName || AddFieldModelName || RemoveClassModelName || RemoveFieldModelName; }
+        }
+
+        public bool ArcFMLicenseRequired
+        {
+            get { return AddClassModelName || AddFieldModelName || RemoveClassModelName || RemoveFieldModelName; }
+        }
+
+        #endregion
+
+        #region Help Generation
+
         [ParserState]
         public IParserState LastParserState { get; set; }
 
@@ -86,5 +98,7 @@ namespace gdbconfig
             helpText += "  Example: sde2string Sample.sde -lv \r\n";
             return helpText;
         }
+
+        #endregion
     }
 }
