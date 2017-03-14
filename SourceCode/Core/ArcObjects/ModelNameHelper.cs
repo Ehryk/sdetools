@@ -2,6 +2,8 @@
 using Miner.Interop;
 using Miner.Geodatabase;
 using ESRI.ArcGIS.Geodatabase;
+using ESRI.ArcGIS.esriSystem;
+using System.Collections.Generic;
 
 namespace Core.ArcObjects
 {
@@ -87,6 +89,36 @@ namespace Core.ArcObjects
             return modelNameManager.ContainsClassModelName(pClass, pModelName);
         }
 
+        public static List<string> ListModelNames(this IObjectClass pClass)
+        {
+            IMMModelNameManager modelNameManager = ModelNameManager.Instance;
+            if (modelNameManager is null)
+                throw new Exception("Cannot instantiate Model Name Manager");
+
+            if (!modelNameManager.CanReadModelNames(pClass))
+                throw new Exception(String.Format("Insufficient Permissions to read Model Names on {0}", pClass.AliasName));
+
+            IEnumBSTR modelNamesEnum = modelNameManager.ClassModelNames(pClass);
+
+            List<string> modelNames = new List<string>();
+            string modelName = modelNamesEnum.Next();
+
+            try
+            {
+                while (!String.IsNullOrEmpty(modelName))
+                {
+                    modelNames.Add(modelName);
+                    modelName = modelNamesEnum.Next();
+                }
+            }
+            catch (Exception ex)
+            {
+                //Iteration Over
+            }
+
+            return modelNames;
+        }
+
         #endregion
 
         #region Field Model Names
@@ -145,6 +177,36 @@ namespace Core.ArcObjects
                 throw new Exception(String.Format("Insufficient Permissions to read Model Names on {0}", pClass.AliasName));
 
             return modelNameManager.ContainsFieldModelName(pClass, pField, pModelName);
+        }
+
+        public static List<string> ListFieldModelNames(this IObjectClass pClass, IField pField)
+        {
+            IMMModelNameManager modelNameManager = ModelNameManager.Instance;
+            if (modelNameManager is null)
+                throw new Exception("Cannot instantiate Model Name Manager");
+
+            if (!modelNameManager.CanReadModelNames(pClass))
+                throw new Exception(String.Format("Insufficient Permissions to read Model Names on {0}", pClass.AliasName));
+
+            IEnumBSTR modelNamesEnum = modelNameManager.FieldModelNames(pClass, pField);
+
+            List<string> modelNames = new List<string>();
+            string modelName = modelNamesEnum.Next();
+
+            try
+            {
+                while (!String.IsNullOrEmpty(modelName))
+                {
+                    modelNames.Add(modelName);
+                    modelName = modelNamesEnum.Next();
+                }
+            }
+            catch (Exception ex)
+            {
+                //Iteration Over
+            }
+
+            return modelNames;
         }
 
         #endregion

@@ -22,17 +22,26 @@ namespace gdbconfig
         [Option("order-domain", DefaultValue = false, HelpText = "Order a Domain")]
         public bool OrderDomain { get; set; }
 
+        [Option("list-domain", DefaultValue = false, HelpText = "List a Domain Contents")]
+        public bool ListDomain { get; set; }
+
         [Option("remove-domain", DefaultValue = false, HelpText = "Remove a Domain value")]
         public bool RemoveDomain { get; set; }
 
         [Option("add-class-model-name", DefaultValue = false, HelpText = "Add a Class Model Name")]
         public bool AddClassModelName { get; set; }
 
+        [Option("list-class-model-names", DefaultValue = false, HelpText = "List Class Model Names")]
+        public bool ListClassModelNames { get; set; }
+
         [Option("remove-class-model-name", DefaultValue = false, HelpText = "Remove a Class Model Name")]
         public bool RemoveClassModelName { get; set; }
 
         [Option("add-field-model-name", DefaultValue = false, HelpText = "Add a Field Model Name")]
         public bool AddFieldModelName { get; set; }
+
+        [Option("list-field-model-names", DefaultValue = false, HelpText = "List Field Model Names")]
+        public bool ListFieldModelNames { get; set; }
 
         [Option("remove-field-model-name", DefaultValue = false, HelpText = "Remove a Field Model Name")]
         public bool RemoveFieldModelName { get; set; }
@@ -75,12 +84,12 @@ namespace gdbconfig
 
         public bool EsriLicenseRequired
         {
-            get { return AddDomain || OrderDomain || RemoveDomain || AddClassModelName || AddFieldModelName || RemoveClassModelName || RemoveFieldModelName; }
+            get { return AddDomain || OrderDomain || ListDomain || OrderDomain || RemoveDomain || AddClassModelName || AddFieldModelName || ListClassModelNames || ListFieldModelNames || RemoveClassModelName || RemoveFieldModelName; }
         }
 
         public bool ArcFMLicenseRequired
         {
-            get { return AddClassModelName || AddFieldModelName || RemoveClassModelName || RemoveFieldModelName; }
+            get { return AddClassModelName || AddFieldModelName || ListClassModelNames || ListFieldModelNames || RemoveClassModelName || RemoveFieldModelName; }
         }
 
         #endregion

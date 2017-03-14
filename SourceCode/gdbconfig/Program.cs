@@ -137,14 +137,66 @@ namespace gdbconfig
 
                             Console.WriteLine("Ordering Domain {0} by {1} {2}", domainName, orderBy, direction);
 
-                            ICodedValueDomain domain = DomainHelper.GetCodedValueDomain(workspace, domainName);
+                            ICodedValueDomain2 domain = DomainHelper.GetCodedValueDomain2(workspace, domainName);
 
                             if (domain == null)
                                 throw new Exception(String.Format("Domain Not Found: {0}", domainName));
 
-                            throw new NotImplementedException("Domain Ordering not yet implemented");
-                            //commandSuccess = domain.OrderDomain(domainName, orderBy, direction);
+                            bool byValue;
+                            switch (orderBy.ToUpper())
+                            {
+                                case "CODE":
+                                case "VALUE":
+                                case "":
+                                default:
+                                    byValue = true;
+                                    break;
+
+                                case "NAME":
+                                case "DESCRIPTION":
+                                case "TEXT":
+                                    byValue = false;
+                                    break;
+                            }
+
+                            bool descending;
+                            switch (direction.ToUpper())
+                            {
+                                case "ASC":
+                                case "ASCENDING":
+                                case "UP":
+                                default:
+                                    descending = true;
+                                    break;
+
+                                case "DSC":
+                                case "DESCENDING":
+                                case "DOWN":
+                                    descending = false;
+                                    break;
+                            }
+
+                            commandSuccess = domain.OrderCodedValue(byValue, descending);
                             ((IWorkspaceDomains2)workspace).AlterDomain(domain as IDomain);
+                        }
+                        else if (options.ListDomain)
+                        {
+                            var domainName = options.Parameter1;
+
+                            Console.WriteLine("Listing Domain {0}:", domainName);
+                            Console.ForegroundColor = ConsoleColor.White;
+
+                            ICodedValueDomain domain = DomainHelper.GetCodedValueDomain(workspace, domainName);
+
+                            if (domain == null)
+                                throw new Exception(String.Format("Domain Not Found: {0}", domainName));
+                            
+                            foreach(var code in domain.ListCodedValues())
+                            {
+                                Console.WriteLine(" - {0} = {1}", code.Key, code.Value);
+                            }
+
+                            commandSuccess = true;
                         }
                         else if (options.RemoveDomain)
                         {
@@ -170,7 +222,29 @@ namespace gdbconfig
 
                             IObjectClass objectClass = workspace.GetObjectClass(className);
 
+                            if (objectClass == null)
+                                throw new Exception(String.Format("Class Not Found: {0}", className));
+
                             commandSuccess = objectClass.AddClassModelName(modelName);
+                        }
+                        else if (options.ListClassModelNames)
+                        {
+                            var className = options.Parameter1;
+
+                            Console.WriteLine("Listing Class Model Names on {0}:", className);
+                            Console.ForegroundColor = ConsoleColor.White;
+
+                            IObjectClass objectClass = workspace.GetObjectClass(className);
+
+                            if (objectClass == null)
+                                throw new Exception(String.Format("Class Not Found: {0}", className));
+
+                            foreach (var code in objectClass.ListModelNames())
+                            {
+                                Console.WriteLine(" - {0}", code);
+                            }
+
+                            commandSuccess = true;
                         }
                         else if (options.RemoveClassModelName)
                         {
@@ -192,9 +266,37 @@ namespace gdbconfig
                             Console.WriteLine("Adding Field Model Name {0} to {1}.{2}", modelName, className, fieldName);
 
                             IObjectClass objectClass = workspace.GetObjectClass(className);
+                            if (objectClass == null)
+                                throw new Exception(String.Format("Class Not Found: {0}", className));
+
                             IField field = objectClass.GetField(fieldName);
+                            if (objectClass == null)
+                                throw new Exception(String.Format("Field {0} Not Found on Class {1}", fieldName, className));
 
                             commandSuccess = objectClass.AddFieldModelName(field, modelName);
+                        }
+                        else if (options.ListFieldModelNames)
+                        {
+                            var className = options.Parameter1;
+                            var fieldName = options.Parameter2;
+
+                            Console.WriteLine("Listing Class Model Names on {0}:", className);
+                            Console.ForegroundColor = ConsoleColor.White;
+
+                            IObjectClass objectClass = workspace.GetObjectClass(className);
+                            if (objectClass == null)
+                                throw new Exception(String.Format("Class Not Found: {0}", className));
+
+                            IField field = objectClass.GetField(fieldName);
+                            if (objectClass == null)
+                                throw new Exception(String.Format("Field {0} Not Found on Class {1}", fieldName, className));
+
+                            foreach (var code in objectClass.ListFieldModelNames(field))
+                            {
+                                Console.WriteLine(" - {0}", code);
+                            }
+
+                            commandSuccess = true;
                         }
                         else if (options.RemoveFieldModelName)
                         {
@@ -205,7 +307,12 @@ namespace gdbconfig
                             Console.WriteLine("Removing Field Model Name {0} from {1}.{2}", modelName, className, fieldName);
 
                             IObjectClass objectClass = workspace.GetObjectClass(className);
+                            if (objectClass == null)
+                                throw new Exception(String.Format("Class Not Found: {0}", className));
+
                             IField field = objectClass.GetField(fieldName);
+                            if (objectClass == null)
+                                throw new Exception(String.Format("Field {0} Not Found on Class {1}", fieldName, className));
 
                             commandSuccess = objectClass.RemoveFieldModelName(field, modelName);
                         }
