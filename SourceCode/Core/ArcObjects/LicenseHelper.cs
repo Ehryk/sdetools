@@ -42,6 +42,26 @@ namespace Core.ArcObjects
 
         #region ESRI License Checkout
 
+        public static bool BindProduct_Engine()
+        {
+            return BindProduct(ProductCode.Engine);
+        }
+
+        public static bool BindProduct_Desktop()
+        {
+            return BindProduct(ProductCode.Desktop);
+        }
+
+        public static bool BindProduct_EngineOrDesktop()
+        {
+            return BindProduct(ProductCode.EngineOrDesktop);
+        }
+
+        public static bool BindProduct(ProductCode pProductCode = ProductCode.Desktop)
+        {
+            return RuntimeManager.Bind(pProductCode);
+        }
+
         /// <summary>
         ///  Attempts to checkout an ESRI Advanced license and returns true if successful.
         /// </summary>

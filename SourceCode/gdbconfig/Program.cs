@@ -31,6 +31,7 @@ namespace gdbconfig
             try
             {
                 var options = new Options();
+                //log4net.Config.XmlConfigurator.Configure();
 
                 if (Parser.Default.ParseArgumentsStrict(args, options))
                 {
@@ -83,7 +84,8 @@ namespace gdbconfig
                         //Checkout appropriate license(s)
                         if (options.EsriLicenseRequired)
                         {
-                            LicenseHelper.GetArcGISLicense_Basic();
+                            LicenseHelper.BindProduct_Desktop();
+                            LicenseHelper.GetArcGISLicense_Standard();
 
                             if (options.Verbose)
                             {
@@ -109,7 +111,7 @@ namespace gdbconfig
                         Console.ForegroundColor = ConsoleColor.Green;
 
                         IWorkspace workspace = SDEFileHelper.GetWorkspaceFromSDEFile(options.InputSDEFile);
-
+                        
                         retCode = FAILURE_EXECUTING;
 
                         if (options.AddDomain)
@@ -118,10 +120,14 @@ namespace gdbconfig
                             var code = options.Parameter2;
                             var name = options.Parameter3 ?? options.Parameter2;
 
-                            Console.WriteLine("Adding Domain (Code|Name) ({0} | {1}) to {2}", code, name, domainName);
-
                             ICodedValueDomain domain = DomainHelper.GetCodedValueDomain(workspace, domainName);
+
+                            if (domain == null)
+                                throw new Exception(String.Format("Domain Not Found: {0}", domainName));
+
+                            Console.WriteLine("Adding Domain (Code|Name) ({0}|{1}) to {2}", code, name, domainName);
                             commandSuccess = domain.AddCodedValue(code, name);
+                            ((IWorkspaceDomains2)workspace).AlterDomain(domain as IDomain);
                         }
                         else if (options.OrderDomain)
                         {
@@ -133,8 +139,12 @@ namespace gdbconfig
 
                             ICodedValueDomain domain = DomainHelper.GetCodedValueDomain(workspace, domainName);
 
+                            if (domain == null)
+                                throw new Exception(String.Format("Domain Not Found: {0}", domainName));
+
                             throw new NotImplementedException("Domain Ordering not yet implemented");
                             //commandSuccess = domain.OrderDomain(domainName, orderBy, direction);
+                            ((IWorkspaceDomains2)workspace).AlterDomain(domain as IDomain);
                         }
                         else if (options.RemoveDomain)
                         {
@@ -144,7 +154,12 @@ namespace gdbconfig
                             Console.WriteLine("Removing Domain (CODE) ({0}) from {1}", code, domainName);
 
                             ICodedValueDomain domain = DomainHelper.GetCodedValueDomain(workspace, domainName);
+
+                            if (domain == null)
+                                throw new Exception(String.Format("Domain Not Found: {0}", domainName));
+
                             commandSuccess = domain.RemoveCodedValue(code);
+                            ((IWorkspaceDomains2)workspace).AlterDomain(domain as IDomain);
                         }
                         else if (options.AddClassModelName)
                         {
@@ -162,7 +177,7 @@ namespace gdbconfig
                             var className = options.Parameter1;
                             var modelName = options.Parameter2;
 
-                            Console.WriteLine("Adding Class Model Name {0} to {1}", modelName, className);
+                            Console.WriteLine("Removing Class Model Name {0} from {1}", modelName, className);
 
                             IObjectClass objectClass = workspace.GetObjectClass(className);
 
@@ -195,8 +210,11 @@ namespace gdbconfig
                             commandSuccess = objectClass.RemoveFieldModelName(field, modelName);
                         }
 
+                        Console.ForegroundColor = ConsoleColor.White;
                         Console.WriteLine();
-                        Console.WriteLine("Command Result: {0}", commandSuccess ? "Success" : "Failure");
+                        Console.Write("Command Result: ");
+                        Console.ForegroundColor = commandSuccess ? ConsoleColor.Green : ConsoleColor.Red;
+                        Console.WriteLine(commandSuccess ? "Success" : "Failure");
                         
                         retCode = commandSuccess ? SUCCESS : FAILURE_EXECUTING;
                     }

@@ -35,22 +35,44 @@ namespace Core.ArcObjects
             return false;
         }
 
-        public static bool AddCodedValue(this ICodedValueDomain pDomain, string pCode, string pName)
+        public static bool AddCodedValue(this ICodedValueDomain pDomain, string pCode, string pName, bool pLockSchema = true)
         {
             if (pDomain is null)
                 throw new ArgumentException("pDomain");
 
+            if (pDomain.HasCode(pCode))
+                return false;
+
+            ISchemaLock schemaLock = (ISchemaLock)pDomain;
+
+            if (pLockSchema)
+                schemaLock.ChangeSchemaLock(esriSchemaLock.esriExclusiveSchemaLock);
+
             pDomain.AddCode(pCode, pName);
+
+            if (pLockSchema)
+                schemaLock.ChangeSchemaLock(esriSchemaLock.esriExclusiveSchemaLock);
 
             return pDomain.HasCode(pCode);
         }
 
-        public static bool RemoveCodedValue(this ICodedValueDomain pDomain, string pCode)
+        public static bool RemoveCodedValue(this ICodedValueDomain pDomain, string pCode, bool pLockSchema = true)
         {
             if (pDomain is null)
                 throw new ArgumentException("pDomain");
 
+            if (!pDomain.HasCode(pCode))
+                return false;
+
+            ISchemaLock schemaLock = (ISchemaLock)pDomain;
+
+            if (pLockSchema)
+                schemaLock.ChangeSchemaLock(esriSchemaLock.esriExclusiveSchemaLock);
+
             pDomain.DeleteCode(pCode);
+
+            if (pLockSchema)
+                schemaLock.ChangeSchemaLock(esriSchemaLock.esriExclusiveSchemaLock);
 
             return !pDomain.HasCode(pCode);
         }

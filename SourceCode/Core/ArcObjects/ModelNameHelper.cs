@@ -37,30 +37,42 @@ namespace Core.ArcObjects
 
         public static bool AddClassModelName(this IObjectClass pClass, string pModelName)
         {
+            if (pClass is null)
+                throw new ArgumentException("pClass");
+
             IMMModelNameManager modelNameManager = ModelNameManager.Instance;
             if (modelNameManager is null)
                 throw new Exception("Cannot instantiate Model Name Manager");
+
+            if (modelNameManager.ContainsClassModelName(pClass, pModelName))
+                return false;
 
             if (!modelNameManager.CanWriteModelNames(pClass))
                 throw new Exception(String.Format("Insufficient Permissions to write Model Names on {0}", pClass.AliasName));
 
             modelNameManager.AddClassModelName(pClass, pModelName);
-
-            return pClass.HasModelName(pModelName);
+            
+            return modelNameManager.ContainsClassModelName(pClass, pModelName);
         }
 
         public static bool RemoveClassModelName(this IObjectClass pClass, string pModelName)
         {
+            if (pClass is null)
+                throw new ArgumentException("pClass");
+
             IMMModelNameManager modelNameManager = ModelNameManager.Instance;
             if (modelNameManager is null)
                 throw new Exception("Cannot instantiate Model Name Manager");
+
+            if (!modelNameManager.ContainsClassModelName(pClass, pModelName))
+                return false;
 
             if (!modelNameManager.CanWriteModelNames(pClass))
                 throw new Exception(String.Format("Insufficient Permissions to write Model Names on {0}", pClass.AliasName));
 
             modelNameManager.RemoveClassModelName(pClass, pModelName);
 
-            return !pClass.HasModelName(pModelName);
+            return !modelNameManager.ContainsClassModelName(pClass, pModelName);
         }
 
         public static bool HasModelName(this IObjectClass pClass, string pModelName)
@@ -81,30 +93,46 @@ namespace Core.ArcObjects
 
         public static bool AddFieldModelName(this IObjectClass pClass, IField pField, string pModelName)
         {
+            if (pClass is null)
+                throw new ArgumentException("pClass");
+            if (pField is null)
+                throw new ArgumentException("pField");
+
             IMMModelNameManager modelNameManager = ModelNameManager.Instance;
             if (modelNameManager is null)
                 throw new Exception("Cannot instantiate Model Name Manager");
+
+            if (modelNameManager.ContainsFieldModelName(pClass, pField, pModelName))
+                return false;
 
             if (!modelNameManager.CanWriteModelNames(pClass))
                 throw new Exception(String.Format("Insufficient Permissions to write Model Names on {0}", pClass.AliasName));
 
             modelNameManager.AddFieldModelName(pClass, pField, pModelName);
 
-            return pClass.HasFieldModelName(pField, pModelName);
+            return modelNameManager.ContainsFieldModelName(pClass, pField, pModelName);
         }
 
         public static bool RemoveFieldModelName(this IObjectClass pClass, IField pField, string pModelName)
         {
+            if (pClass is null)
+                throw new ArgumentException("pClass");
+            if (pField is null)
+                throw new ArgumentException("pField");
+
             IMMModelNameManager modelNameManager = ModelNameManager.Instance;
             if (modelNameManager is null)
                 throw new Exception("Cannot instantiate Model Name Manager");
+
+            if (!modelNameManager.ContainsFieldModelName(pClass, pField, pModelName))
+                return false;
 
             if (!modelNameManager.CanWriteModelNames(pClass))
                 throw new Exception(String.Format("Insufficient Permissions to write Model Names on {0}", pClass.AliasName));
 
             modelNameManager.RemoveFieldModelName(pClass, pField, pModelName);
 
-            return !pClass.HasFieldModelName(pField, pModelName);
+            return !modelNameManager.ContainsFieldModelName(pClass, pField, pModelName);
         }
 
         public static bool HasFieldModelName(this IObjectClass pClass, IField pField, string pModelName)
