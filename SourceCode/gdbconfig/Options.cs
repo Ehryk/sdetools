@@ -29,34 +29,34 @@ namespace gdbconfig
 
         #region Commands
 
-        [Option("add-domain", DefaultValue = false, HelpText = "Add a Domain value")]
+        [Option("add-domain", DefaultValue = false, HelpText = "Add a Domain value", MutuallyExclusiveSet = "command")]
         public bool AddDomain { get; set; }
 
-        [Option("order-domain", DefaultValue = false, HelpText = "Order a Domain")]
+        [Option("order-domain", DefaultValue = false, HelpText = "Order a Domain", MutuallyExclusiveSet = "command")]
         public bool OrderDomain { get; set; }
 
-        [Option("list-domain", DefaultValue = false, HelpText = "List a Domain Contents")]
+        [Option("list-domain", DefaultValue = false, HelpText = "List a Domain Contents", MutuallyExclusiveSet = "command")]
         public bool ListDomain { get; set; }
 
-        [Option("remove-domain", DefaultValue = false, HelpText = "Remove a Domain value")]
+        [Option("remove-domain", DefaultValue = false, HelpText = "Remove a Domain value", MutuallyExclusiveSet = "command")]
         public bool RemoveDomain { get; set; }
 
-        [Option("add-class-model-name", DefaultValue = false, HelpText = "Add a Class Model Name")]
+        [Option("add-class-model-name", DefaultValue = false, HelpText = "Add a Class Model Name", MutuallyExclusiveSet = "command")]
         public bool AddClassModelName { get; set; }
 
-        [Option("list-class-model-name", DefaultValue = false, HelpText = "List Class Model Names")]
+        [Option("list-class-model-name", DefaultValue = false, HelpText = "List Class Model Names", MutuallyExclusiveSet = "command")]
         public bool ListClassModelNames { get; set; }
 
-        [Option("remove-class-model-name", DefaultValue = false, HelpText = "Remove a Class Model Name")]
+        [Option("remove-class-model-name", DefaultValue = false, HelpText = "Remove a Class Model Name", MutuallyExclusiveSet = "command")]
         public bool RemoveClassModelName { get; set; }
 
-        [Option("add-field-model-name", DefaultValue = false, HelpText = "Add a Field Model Name")]
+        [Option("add-field-model-name", DefaultValue = false, HelpText = "Add a Field Model Name", MutuallyExclusiveSet = "command")]
         public bool AddFieldModelName { get; set; }
 
-        [Option("list-field-model-name", DefaultValue = false, HelpText = "List Field Model Names")]
+        [Option("list-field-model-name", DefaultValue = false, HelpText = "List Field Model Names", MutuallyExclusiveSet = "command")]
         public bool ListFieldModelNames { get; set; }
 
-        [Option("remove-field-model-name", DefaultValue = false, HelpText = "Remove a Field Model Name")]
+        [Option("remove-field-model-name", DefaultValue = false, HelpText = "Remove a Field Model Name", MutuallyExclusiveSet = "command")]
         public bool RemoveFieldModelName { get; set; }
 
         #endregion
@@ -69,7 +69,7 @@ namespace gdbconfig
         [Option('h', "help", DefaultValue = false, HelpText = "Show Help and Usage")]
         public bool Help { get; set; }
 
-        [Option('t', "test", DefaultValue = false, HelpText = "Test Connection and Exit")]
+        [Option('t', "test", DefaultValue = false, HelpText = "Test Connection and Exit", MutuallyExclusiveSet = "command")]
         public bool Test { get; set; }
 
         [Option('V', "verbose", DefaultValue = false, HelpText = "Prints all messages to standard output.")]

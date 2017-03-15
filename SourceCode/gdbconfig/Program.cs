@@ -33,7 +33,7 @@ namespace gdbconfig
                 var options = new Options();
                 //log4net.Config.XmlConfigurator.Configure();
 
-                var parser = new Parser(with => with.CaseSensitive = true);
+                var parser = new Parser(with => { with.CaseSensitive = true; with.MutuallyExclusive = true; });
                 if (parser.ParseArguments(args, options))
                 {
                     // Values are available here
@@ -47,6 +47,7 @@ namespace gdbconfig
 
                     if (options.Version)
                     {
+                        Console.ForegroundColor = ConsoleColor.Cyan;
                         if (options.Newline)
                             Console.Write("{0} v{1}", ApplicationInfo.Title, ApplicationInfo.Version);
                         else
@@ -497,18 +498,18 @@ namespace gdbconfig
             Console.WriteLine("Usage and Examples: ");
             Console.ResetColor();
             Console.WriteLine(" > gdbconfig.exe -h");
-            Console.WriteLine(" > gdbconfig --test -i=connection.sde");
-            Console.WriteLine(" > gdbconfig gdb.sde --add-domain Domain Value [Name]");
-            Console.WriteLine(" > gdbconfig gdb.sde --list-domain Domain");
-            Console.WriteLine(" > gdbconfig gdb.sde --order-domain Domain [VALUE|Name] [ASC|DESC]");
-            Console.WriteLine(" > gdbconfig gdb.sde --remove-domain Domain Value");
-            Console.WriteLine(" > gdbconfig gdb.sde --add-class-model-name ClassName ModelName");
-            Console.WriteLine(" > gdbconfig gdb.sde --list-class-model-name ClassName");
-            Console.WriteLine(" > gdbconfig gdb.sde --remove-class-model-name ClassName ModelName");
-            Console.WriteLine(" > gdbconfig gdb.sde --add-field-model-name ClassName FieldName ModelName");
-            Console.WriteLine(" > gdbconfig gdb.sde --list-field-model-name ClassName FieldName");
-            Console.WriteLine(" > gdbconfig gdb.sde --remove-field-model-name ClassName FieldName ModelName");
-            Console.WriteLine(" > gdbconfig --dry-run -p1 Domain -p2 Value -p3 Name --input connection.sde -Vp");
+            Console.WriteLine(" > gdbconfig --test -i=connection.sde {Options}");
+            Console.WriteLine(" > gdbconfig gdb.sde --add-domain    <Domain> <Value> [<Name>]");
+            Console.WriteLine(" > gdbconfig gdb.sde --list-domain   <Domain>");
+            Console.WriteLine(" > gdbconfig gdb.sde --order-domain  <Domain> [VALUE|Name] [ASC|DESC]");
+            Console.WriteLine(" > gdbconfig gdb.sde --remove-domain <Domain> <Value>");
+            Console.WriteLine(" > gdbconfig gdb.sde --add-class-model-name    <ClassName> <ModelName>");
+            Console.WriteLine(" > gdbconfig gdb.sde --list-class-model-name   <ClassName>");
+            Console.WriteLine(" > gdbconfig gdb.sde --remove-class-model-name <ClassName> <ModelName>");
+            Console.WriteLine(" > gdbconfig gdb.sde --add-field-model-name    <ClassName> <FieldName> <ModelName>");
+            Console.WriteLine(" > gdbconfig gdb.sde --list-field-model-name   <ClassName> <FieldName>");
+            Console.WriteLine(" > gdbconfig gdb.sde --remove-field-model-name <ClassName> <FieldName> <ModelName>");
+            Console.WriteLine(" > gdbconfig --dry-run -p1 <Domain> -p2 <Value> -p3 <Name> --input connection.sde -Vp");
             Console.WriteLine(" > gdbconfig [? | /? | -? | -h | --help | --version]");
             Console.WriteLine();
             Console.ForegroundColor = ConsoleColor.White;
