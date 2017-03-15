@@ -490,7 +490,7 @@ namespace gdbconfig
                         else
                         {
                             retCode = FAILURE_ARGUMENTS;
-                            commandSuccess = true;
+                            throw new Exception("No command specified. Use -h or --help for usage.");
                         }
 
                         Console.ForegroundColor = ConsoleColor.White;
@@ -560,6 +560,13 @@ namespace gdbconfig
             finally
             {
                 CheckPause(pause);
+            }
+
+            if (verbose)
+            {
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.WriteLine(" === Return Code: {0} ===", retCode);
+                Console.ResetColor();
             }
 
             return retCode;
