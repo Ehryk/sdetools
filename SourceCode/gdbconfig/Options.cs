@@ -7,11 +7,12 @@ namespace gdbconfig
     // Class to receive parsed values
     public class Options
     {
+        #region Command Line Options
+
         [ValueOption(0)]
         [Option('i', "input", Required = false, HelpText = "Input .sde file for connection")]
         public string InputSDEFile { get; set; }
 
-        #region Modes
 
         [Option("version", DefaultValue = false, HelpText = "Display Version and Exit")]
         public bool Version { get; set; }

@@ -6,9 +6,9 @@ namespace Core.Encodings
 {
     public class Encodings
     {
-        public static Encoding GetEncoding(string encoding = "Default", bool littleEndian = true)
+        public static Encoding GetEncoding(string pEncoding = "Default", bool pLittleEndian = true)
         {
-            switch (encoding.ToAlphanumeric().ToUpper())
+            switch (pEncoding.ToAlphanumeric().ToUpper())
             {
                 case "UTF8":
                 case "8":
@@ -24,11 +24,11 @@ namespace Core.Encodings
                 case "UNICODE":
                 case "UTF16":
                 case "16":
-                    return new UnicodeEncoding(!littleEndian, false, true);
+                    return new UnicodeEncoding(!pLittleEndian, false, true);
 
                 case "UTF32":
                 case "32":
-                    return new UTF32Encoding(!littleEndian, false, true);
+                    return new UTF32Encoding(!pLittleEndian, false, true);
 
                 case "SYSTEMDEFAULT":
                 case "SYSTEM":
@@ -37,7 +37,7 @@ namespace Core.Encodings
                     return Encoding.Default;
 
                 default:
-                    throw new NotSupportedException(String.Format("Unsupported Encoding ({0})", encoding));
+                    throw new NotSupportedException(String.Format("Unsupported Encoding ({0})", pEncoding));
             }
         }
     }

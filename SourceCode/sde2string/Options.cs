@@ -7,8 +7,10 @@ namespace sde2string
     // Class to receive parsed values
     public class Options
     {
+        #region Command Line Options
+
         [ValueOption(0)]
-        [Option('i', "input", Required = false, HelpText = "Input file to be processed.")]
+        [Option('i', "input", Required = false, HelpText = "Input .sde file to be processed.")]
         public string InputFile { get; set; }
 
         [Option('c', "connect", DefaultValue = false, HelpText = "Establishes the SDE Connection and examines with ESRI libraries.")]
@@ -41,6 +43,19 @@ namespace sde2string
         [Option("version", DefaultValue = false, HelpText = "Display Version and Exit.")]
         public bool Version { get; set; }
 
+        #endregion
+
+        #region Calculated
+
+        public bool EsriLicenseRequired
+        {
+            get { return Connect; }
+        }
+
+        #endregion
+
+        #region Help Generation
+
         [ParserState]
         public IParserState LastParserState { get; set; }
 
@@ -52,5 +67,7 @@ namespace sde2string
             helpText += "  Example: sde2string Sample.sde -lv \r\n";
             return helpText;
         }
+
+        #endregion
     }
 }

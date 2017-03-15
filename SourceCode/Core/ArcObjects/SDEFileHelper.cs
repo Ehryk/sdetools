@@ -15,39 +15,39 @@ namespace Core.ArcObjects
     {
         #region SDE File Helpers
 
-        public static string GetConnectionStringFromSDEFile(string path, bool bracketless)
+        public static string GetConnectionStringFromSDEFile(string pPath, bool pBracketless)
         {
-            return GetPropertySetFromSDEFile(path).ToPropertiesString(bracketless);
+            return GetPropertySetFromSDEFile(pPath).ToPropertiesString(pBracketless);
         }
 
-        public static IPropertySet GetPropertySetFromSDEFile(string path)
+        public static IPropertySet GetPropertySetFromSDEFile(string pPath)
         {
-            return GetWorkspaceFromSDEFile(path).ConnectionProperties;
+            return GetWorkspaceFromSDEFile(pPath).ConnectionProperties;
         }
 
-        public static Dictionary<string, string> GetDictionaryFromSDEFile(string path)
+        public static Dictionary<string, string> GetDictionaryFromSDEFile(string pPath)
         {
-            return GetWorkspaceFromSDEFile(path).ConnectionProperties.ToDictionary();
+            return GetWorkspaceFromSDEFile(pPath).ConnectionProperties.ToDictionary();
         }
 
-        public static IWorkspace GetWorkspaceFromSDEFile(string path)
+        public static IWorkspace GetWorkspaceFromSDEFile(string pPath)
         {
-            return WorkspaceFromSDEFile(path);
+            return WorkspaceFromSDEFile(pPath);
         }
 
-        public static IFeatureWorkspace GetFeatureWorkspaceFromSDEFile(string path)
+        public static IFeatureWorkspace GetFeatureWorkspaceFromSDEFile(string pPath)
         {
-            return FeatureWorkspaceFromSDEFile(path);
+            return FeatureWorkspaceFromSDEFile(pPath);
         }
 
-        public static Dictionary<string, string> DirectParseSDEFile(string path, Encoding encoding = null)
+        public static Dictionary<string, string> DirectParseSDEFile(string pPath, Encoding pEncoding = null)
         {
             string contents;
 
-            if (encoding == null)
-                contents = File.ReadAllText(path);
+            if (pEncoding == null)
+                contents = File.ReadAllText(pPath);
             else
-                contents = encoding.GetString(File.ReadAllBytes(path));
+                contents = pEncoding.GetString(File.ReadAllBytes(pPath));
 
             return GetSDEDictionary(contents);
         }
@@ -61,15 +61,15 @@ namespace Core.ArcObjects
 
         #region Workspace Helpers
 
-        private static IFeatureWorkspace FeatureWorkspaceFromSDEFile(string path)
+        private static IFeatureWorkspace FeatureWorkspaceFromSDEFile(string pPath)
         {
-            return WorkspaceFromSDEFile(path) as IFeatureWorkspace;
+            return WorkspaceFromSDEFile(pPath) as IFeatureWorkspace;
         }
 
-        private static IWorkspace WorkspaceFromSDEFile(string path)
+        private static IWorkspace WorkspaceFromSDEFile(string pPath)
         {
             SdeWorkspaceFactory pWSFactory = new SdeWorkspaceFactory();
-            IWorkspace pWSpace = pWSFactory.OpenFromFile(path, 0);
+            IWorkspace pWSpace = pWSFactory.OpenFromFile(pPath, 0);
 
             return pWSpace;
         }
@@ -141,16 +141,16 @@ namespace Core.ArcObjects
             return pWSpace as IFeatureWorkspace;
         }
 
-        private static IWorkspace GetWorkspaceFromConnectionPropertySet(IPropertySet propertySet)
+        private static IWorkspace GetWorkspaceFromConnectionPropertySet(IPropertySet pPropertySet)
         {
-            if (propertySet == null)
-                throw new ArgumentNullException("propertySet");
+            if (pPropertySet == null)
+                throw new ArgumentNullException("pPropertySet");
 
             String connectionProperties = null;
             try
             {
                 // for error reference - convert to string
-                connectionProperties = propertySet.ToPropertiesString(true);
+                connectionProperties = pPropertySet.ToPropertiesString(true);
 
                 var factoryType = Type.GetTypeFromProgID("esriDataSourcesGDB.SdeWorkspaceFactory");
                 var workspaceFactory = (IWorkspaceFactory2)Activator.CreateInstance(factoryType);
@@ -159,7 +159,7 @@ namespace Core.ArcObjects
                 IWorkspaceFactorySchemaCache workspaceFactorySchemaCache = (IWorkspaceFactorySchemaCache)workspaceFactory;
                 workspaceFactorySchemaCache.EnableSchemaCaching();
 
-                return workspaceFactory.Open(propertySet, 0);
+                return workspaceFactory.Open(pPropertySet, 0);
             }
             catch (Exception ex)
             {
@@ -169,32 +169,32 @@ namespace Core.ArcObjects
             }
         }
 
-        private static IWorkspace GetWorkspaceSDEFromConnectionFile(string connectionFilePath, int windowHandle)
+        private static IWorkspace GetWorkspaceSDEFromConnectionFile(string pPath, int pWindowHandle)
         {
             try
             {
                 var factoryType = Type.GetTypeFromProgID("esriDataSourcesGDB.SdeWorkspaceFactory");
                 var workspaceFactory = (IWorkspaceFactory)Activator.CreateInstance(factoryType);
+
                 // Enable Schema Cache
-                IWorkspaceFactorySchemaCache workspaceFactorySchemaCache =
-                         (IWorkspaceFactorySchemaCache)workspaceFactory;
+                IWorkspaceFactorySchemaCache workspaceFactorySchemaCache = (IWorkspaceFactorySchemaCache)workspaceFactory;
                 workspaceFactorySchemaCache.EnableSchemaCaching();
 
-                return workspaceFactory.OpenFromFile(connectionFilePath, windowHandle);
+                return workspaceFactory.OpenFromFile(pPath, pWindowHandle);
             }
             catch (System.Runtime.InteropServices.COMException ex)
             {
                 throw new Exception(
                          String.Format(
                                   "Failed to Open SDE Workspace from Connection File Path. Verify the SDE file [{0}] exists.",
-                                 connectionFilePath), ex);
+                                 pPath), ex);
             }
         }
 
-        private static IWorkspace GetWorkspaceSDEFromProjectConnectionFile(string connectionFileName)
+        private static IWorkspace GetWorkspaceSDEFromProjectConnectionFile(string pFileName, string pPath = "Data/SDEConnections/")
         {
-            if (connectionFileName == null)
-                throw new ArgumentNullException("connectionFileName");
+            if (pFileName == null)
+                throw new ArgumentNullException("pFileName");
 
             try
             {
@@ -205,33 +205,33 @@ namespace Core.ArcObjects
                 IWorkspaceFactorySchemaCache workspaceFactorySchemaCache = (IWorkspaceFactorySchemaCache)workspaceFactory;
                 workspaceFactorySchemaCache.EnableSchemaCaching();
 
-                string connectionFilePath = string.Format("Data/SDEConnections/{0}", connectionFileName);
-                return workspaceFactory.OpenFromFile(connectionFilePath, 0);
+                string fullPath = String.Concat(pPath, pFileName);
+                return workspaceFactory.OpenFromFile(fullPath, 0);
             }
             catch (System.Runtime.InteropServices.COMException ex)
             {
                 throw new Exception(
                          String.Format(
                                   "Failed to Open SDE Workspace from [Project] Connection File. Verify the SDE file [{0}] is included in the project build output.",
-                                 connectionFileName), ex);
+                                 pFileName), ex);
             }
         }
 
-        private static IFeatureClass GetFeatureClassFromWorkspace(string featureClassName, IWorkspace workspace)
+        private static IFeatureClass GetFeatureClassFromWorkspace(string pFeatureClassName, IWorkspace pWorkspace)
         {
             IFeatureClass featureClass;
 
-            if (workspace is Sde4Workspace)
+            if (pWorkspace is Sde4Workspace)
             {
-                IFeatureWorkspace featureWorkspace = (IFeatureWorkspace)workspace;
-                featureClass = featureWorkspace.OpenFeatureClass(featureClassName);
+                IFeatureWorkspace featureWorkspace = (IFeatureWorkspace)pWorkspace;
+                featureClass = featureWorkspace.OpenFeatureClass(pFeatureClassName);
             }
             else
             {
                 throw new ArgumentNullException("workspace",
                          string.Format(
                                   "The workspace [{0}] is not an SDE database. Cannot retrieve the feature class [{1}]",
-                                 workspace.PathName, featureClassName));
+                                 pWorkspace.PathName, pFeatureClassName));
             }
 
             return featureClass;

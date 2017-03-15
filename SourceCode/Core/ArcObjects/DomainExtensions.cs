@@ -15,25 +15,25 @@ namespace Core.ArcObjects
 
         #region IWorkspace Extensions
 
-        public static IDomain GetDomain(this IWorkspace workspace, string name)
+        public static IDomain GetDomain(this IWorkspace pWorkspace, string pName)
         {
-            IWorkspaceDomains workspaceDomains = (IWorkspaceDomains)workspace;
-            IDomain domain = workspaceDomains.get_DomainByName(name);
+            IWorkspaceDomains workspaceDomains = (IWorkspaceDomains)pWorkspace;
+            IDomain domain = workspaceDomains.get_DomainByName(pName);
             return domain;
         }
 
-        public static ICodedValueDomain GetCodedValueDomain(this IWorkspace workspace, string name)
+        public static ICodedValueDomain GetCodedValueDomain(this IWorkspace pWorkspace, string pName)
         {
-            IWorkspaceDomains workspaceDomains = (IWorkspaceDomains)workspace;
-            IDomain domain = workspaceDomains.get_DomainByName(name);
+            IWorkspaceDomains workspaceDomains = (IWorkspaceDomains)pWorkspace;
+            IDomain domain = workspaceDomains.get_DomainByName(pName);
             ICodedValueDomain codedValueDomain = (ICodedValueDomain)domain;
             return codedValueDomain;
         }
 
-        public static ICodedValueDomain2 GetCodedValueDomain2(this IWorkspace workspace, string name)
+        public static ICodedValueDomain2 GetCodedValueDomain2(this IWorkspace pWorkspace, string pName)
         {
-            IWorkspaceDomains2 workspaceDomains = (IWorkspaceDomains2)workspace;
-            IDomain domain = workspaceDomains.DomainByName[name];
+            IWorkspaceDomains2 workspaceDomains = (IWorkspaceDomains2)pWorkspace;
+            IDomain domain = workspaceDomains.DomainByName[pName];
             ICodedValueDomain2 codedValueDomain = (ICodedValueDomain2)domain;
             return codedValueDomain;
         }

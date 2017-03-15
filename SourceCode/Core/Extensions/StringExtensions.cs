@@ -8,65 +8,75 @@ namespace Core.Extensions
         /// <summary>
         /// Convert Hash bytes to Hexadecimal String format. Defaults to UTF8 Encoding.
         /// </summary>
-        public static byte[] ToBytes(this string input, Encoding encoding = null)
+        public static byte[] ToBytes(this string pInput, Encoding pEncoding = null)
         {
-            encoding = encoding ?? new UTF8Encoding();
-            return encoding.GetBytes(input);
+            pEncoding = pEncoding ?? new UTF8Encoding();
+            return pEncoding.GetBytes(pInput);
         }
 
         /// <summary>
         /// Convert Hash bytes to Hexadecimal String format 
         /// </summary>
-        public static bool EqualsIgnoreCase(this string input, string other, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
+        public static bool EqualsIgnoreCase(this string pInput, string pOther, StringComparison pComparison = StringComparison.OrdinalIgnoreCase)
         {
-            return input.Equals(other, comparison);
+            return pInput.Equals(pOther, pComparison);
         }
 
         /// <summary>
         /// Remove non-alphanumeric characters from a string (and optionally whitespace as well)
         /// </summary>
-        public static string ToAlphanumeric(this string input, bool allowWhiteSpace = false)
+        public static string ToAlphanumeric(this string pInput, bool pAllowWhiteSpace = false)
         {
-            if (allowWhiteSpace)
-                return new string(Array.FindAll(input.ToCharArray(), (c => (char.IsLetterOrDigit(c) || char.IsWhiteSpace(c)))));
+            if (pAllowWhiteSpace)
+                return new string(Array.FindAll(pInput.ToCharArray(), (c => (char.IsLetterOrDigit(c) || char.IsWhiteSpace(c)))));
 
-            return new string(Array.FindAll(input.ToCharArray(), (c => (char.IsLetterOrDigit(c)))));
+            return new string(Array.FindAll(pInput.ToCharArray(), (c => (char.IsLetterOrDigit(c)))));
         }
 
         /// <summary>
         /// Performs a given type of string comparison contains
         /// </summary>
-        public static bool Contains(this string source, string toCheck, StringComparison comp)
+        public static bool Contains(this string pSource, string pToCheck, StringComparison pComparison)
         {
-            return source.IndexOf(toCheck, comp) >= 0;
+            return pSource.IndexOf(pToCheck, pComparison) >= 0;
         }
 
         /// <summary>
         /// Performs a case sensitive comparison contains
         /// </summary>
-        public static bool ContainsIgnoreCase(this string source, string toCheck)
+        public static bool ContainsIgnoreCase(this string pSource, string pToCheck)
         {
-            return source.IndexOf(toCheck, StringComparison.CurrentCultureIgnoreCase) >= 0;
+            return pSource.IndexOf(pToCheck, StringComparison.CurrentCultureIgnoreCase) >= 0;
         }
 
-        public static int ToInt(this string s, int fallback = -1)
+        public static int ToInt(this string s, int pDefault = -1)
         {
-            return ToNullableInt(s) ?? fallback;
+            return ToNullableInt(s) ?? pDefault;
         }
 
         public static int? ToNullableInt(this string s)
         {
-            return int.TryParse(s, out int i) ? i : (int?)null;
+            return Int32.TryParse(s, out int i) ? i : (int?)null;
         }
 
-        public static decimal ToDecimal(this string o, decimal fallback = 0)
+        public static long ToLong(this string s, long pDefault = -1)
         {
-            return ToNullableDecimal(o) ?? fallback;
+            return ToNullableLong(s) ?? pDefault;
         }
 
-        public static decimal? ToNullableDecimal(this string o)
+        public static long? ToNullableLong(this string s)
         {
-            return Decimal.TryParse(o, out decimal d) ? d : (decimal?)null;
+            return Int64.TryParse(s, out long i) ? i : (long?)null;
+        }
+
+        public static decimal ToDecimal(this string s, decimal pDefault = 0)
+        {
+            return ToNullableDecimal(s) ?? pDefault;
+        }
+
+        public static decimal? ToNullableDecimal(this string s)
+        {
+            return Decimal.TryParse(s, out decimal d) ? d : (decimal?)null;
         }
 
         public static DateTime ToDateTime(this string s)
@@ -79,14 +89,14 @@ namespace Core.Extensions
             return DateTime.TryParse(s, out DateTime d) ? d : (DateTime?)null;
         }
 
-        public static bool ToBoolean(this string o, bool fallback = false)
+        public static bool ToBoolean(this string s, bool pDefault = false)
         {
-            return ToNullableBoolean(o) ?? fallback;
+            return ToNullableBoolean(s) ?? pDefault;
         }
 
-        public static bool? ToNullableBoolean(this string o)
+        public static bool? ToNullableBoolean(this string s)
         {
-            return Boolean.TryParse(o, out bool b) ? b : (bool?)null;
+            return Boolean.TryParse(s, out bool b) ? b : (bool?)null;
         }
     }
 }

@@ -8,14 +8,14 @@ namespace Core.ArcObjects
 {
     public static class PropertySetHelper
     {
-        public static IPropertySet PropertySetFromString(string propertySetText)
+        public static IPropertySet PropertySetFromString(string pPropertySetText)
         {
-            if (String.IsNullOrEmpty(propertySetText))
-                throw new ArgumentNullException("propertySetText");
+            if (String.IsNullOrEmpty(pPropertySetText))
+                throw new ArgumentNullException("pPropertySetText");
 
             IPropertySet propertySet = new PropertySetClass();
 
-            string[] properties = propertySetText.Split(new[] { ';' });
+            string[] properties = pPropertySetText.Split(new[] { ';' });
 
             for (int i = 0; i < properties.Count(); i++)
             {

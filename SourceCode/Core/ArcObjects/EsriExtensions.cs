@@ -42,40 +42,40 @@ namespace Core.ArcObjects
 
         #region IPropertySet Extensions
 
-        public static string ToPropertiesString(this IPropertySet propertySet, bool bracketless = false)
+        public static string ToPropertiesString(this IPropertySet pPropertySet, bool pBracketless = false)
         {
-            if (propertySet == null)
+            if (pPropertySet == null)
                 throw new ArgumentNullException("propertySet");
 
-            string format = bracketless ? "{0}={1};" : "[{0}]={1}";
+            string format = pBracketless ? "{0}={1};" : "[{0}]={1}";
 
-            return propertySet.ToPropertiesString(format);
+            return pPropertySet.ToPropertiesString(format);
         }
 
-        public static string ToPropertiesString(this IPropertySet propertySet, string format = "{0}={1}\r\n")
+        public static string ToPropertiesString(this IPropertySet pPropertySet, string pFormat = "{0}={1}\r\n")
         {
-            if (propertySet == null)
+            if (pPropertySet == null)
                 throw new ArgumentNullException("propertySet");
 
             StringBuilder result = new StringBuilder();
 
-            foreach (var property in propertySet.ToDictionary())
+            foreach (var property in pPropertySet.ToDictionary())
             {
-                result.AppendFormat(format, property.Key, property.Value);
+                result.AppendFormat(pFormat, property.Key, property.Value);
             }
 
             return result.ToString().Trim();
         }
 
-        public static Dictionary<string, string> ToDictionary(this IPropertySet propertySet)
+        public static Dictionary<string, string> ToDictionary(this IPropertySet pPropertySet)
         {
-            if (propertySet == null)
+            if (pPropertySet == null)
                 throw new ArgumentNullException("propertySet");
 
-            int propertyCount = propertySet.Count;
+            int propertyCount = pPropertySet.Count;
             var dictionary = new Dictionary<string, string>();
 
-            propertySet.GetAllProperties(out object nameArray, out object valueArray);
+            pPropertySet.GetAllProperties(out object nameArray, out object valueArray);
             object[] names = (object[])nameArray;
             object[] values = (object[])valueArray;
 
