@@ -47,9 +47,9 @@ namespace gdbconfig
                     if (options.Version)
                     {
                         if (options.Newline)
-                            Console.Write("{0} v{1}", ApplicationInfo.ProductName, ApplicationInfo.Version);
+                            Console.Write("{0} v{1}", ApplicationInfo.Title, ApplicationInfo.Version);
                         else
-                            Console.WriteLine("{0} v{1}", ApplicationInfo.ProductName, ApplicationInfo.Version);
+                            Console.WriteLine("{0} v{1}", ApplicationInfo.Title, ApplicationInfo.Version);
                         return SUCCESS;
                     }
 
@@ -120,7 +120,7 @@ namespace gdbconfig
                             var code = options.Parameter2;
                             var name = options.Parameter3 ?? options.Parameter2;
 
-                            ICodedValueDomain domain = DomainHelper.GetCodedValueDomain(workspace, domainName);
+                            ICodedValueDomain domain = DomainExtensions.GetCodedValueDomain(workspace, domainName);
 
                             if (domain == null)
                                 throw new Exception(String.Format("Domain Not Found: {0}", domainName));
@@ -137,7 +137,7 @@ namespace gdbconfig
 
                             Console.WriteLine("Ordering Domain {0} by {1} {2}", domainName, orderBy, direction);
 
-                            ICodedValueDomain2 domain = DomainHelper.GetCodedValueDomain2(workspace, domainName);
+                            ICodedValueDomain2 domain = DomainExtensions.GetCodedValueDomain2(workspace, domainName);
 
                             if (domain == null)
                                 throw new Exception(String.Format("Domain Not Found: {0}", domainName));
@@ -186,7 +186,7 @@ namespace gdbconfig
                             Console.WriteLine("Listing Domain {0}:", domainName);
                             Console.ForegroundColor = ConsoleColor.White;
 
-                            ICodedValueDomain domain = DomainHelper.GetCodedValueDomain(workspace, domainName);
+                            ICodedValueDomain domain = DomainExtensions.GetCodedValueDomain(workspace, domainName);
 
                             if (domain == null)
                                 throw new Exception(String.Format("Domain Not Found: {0}", domainName));
@@ -205,7 +205,7 @@ namespace gdbconfig
 
                             Console.WriteLine("Removing Domain (CODE) ({0}) from {1}", code, domainName);
 
-                            ICodedValueDomain domain = DomainHelper.GetCodedValueDomain(workspace, domainName);
+                            ICodedValueDomain domain = DomainExtensions.GetCodedValueDomain(workspace, domainName);
 
                             if (domain == null)
                                 throw new Exception(String.Format("Domain Not Found: {0}", domainName));

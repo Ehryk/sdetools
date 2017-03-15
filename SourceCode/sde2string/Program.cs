@@ -43,9 +43,9 @@ namespace sde2string
                     if (options.Version)
                     {
                         if (options.Newline)
-                            Console.Write("{0} v{1}", ApplicationInfo.ProductName, ApplicationInfo.Version);
+                            Console.Write("{0} v{1}", ApplicationInfo.Title, ApplicationInfo.Version);
                         else
-                            Console.WriteLine("{0} v{1}", ApplicationInfo.ProductName, ApplicationInfo.Version);
+                            Console.WriteLine("{0} v{1}", ApplicationInfo.Title, ApplicationInfo.Version);
                         return SUCCESS;
                     }
 

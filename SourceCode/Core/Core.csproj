@@ -108,9 +108,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ArcObjects\DomainHelper.cs" />
+    <Compile Include="ArcObjects\DomainExtensions.cs" />
+    <Compile Include="ArcObjects\EsriExtensions.cs" />
     <Compile Include="ArcObjects\LicenseHelper.cs" />
-    <Compile Include="ArcObjects\ModelNameHelper.cs" />
+    <Compile Include="ArcObjects\ModelNameExtensions.cs" />
     <Compile Include="ArcObjects\PropertySetHelper.cs" />
     <Compile Include="ArcObjects\SDEFileHelper.cs" />
     <Compile Include="ApplicationInfo\ApplicationInfo.cs" />

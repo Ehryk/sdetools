@@ -219,9 +219,26 @@ namespace Core.ArcObjects
         {
             //Release COM objects and shut down the AoInitilaize object
             AOUninitialize.Shutdown();
-
             _MMAppInit?.Shutdown();
             _AoInitialize?.Shutdown();
+        }
+
+        /// <summary>
+        /// Releases ArcGIS license.
+        /// </summary>
+        public static void ReleaseESRILicense()
+        {
+            //Release COM objects and shut down the AoInitilaize object
+            AOUninitialize.Shutdown();
+            _AoInitialize?.Shutdown();
+        }
+
+        /// <summary>
+        /// Releases ArcFM license.
+        /// </summary>
+        public static void ReleaseArcFMLicense()
+        {
+            _MMAppInit?.Shutdown();
         }
 
         #endregion

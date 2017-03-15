@@ -1,14 +1,21 @@
 ﻿using System;
-using Miner.Interop;
-using Miner.Geodatabase;
+using System.Collections.Generic;
+using log4net;
 using ESRI.ArcGIS.Geodatabase;
 using ESRI.ArcGIS.esriSystem;
-using System.Collections.Generic;
+using Miner.Interop;
+using Miner.Geodatabase;
 
 namespace Core.ArcObjects
 {
-    public static class ModelNameHelper
+    public static class ModelNameExtensions
     {
+        #region Private Properties
+
+        private static readonly log4net.ILog _log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        #endregion
+
         #region IObjectClass Retrieval
 
         public static IObjectClass GetObjectClass(this IWorkspace pWorkspace, string pName)
@@ -100,23 +107,7 @@ namespace Core.ArcObjects
 
             IEnumBSTR modelNamesEnum = modelNameManager.ClassModelNames(pClass);
 
-            List<string> modelNames = new List<string>();
-            string modelName = modelNamesEnum.Next();
-
-            try
-            {
-                while (!String.IsNullOrEmpty(modelName))
-                {
-                    modelNames.Add(modelName);
-                    modelName = modelNamesEnum.Next();
-                }
-            }
-            catch (Exception ex)
-            {
-                //Iteration Over
-            }
-
-            return modelNames;
+            return modelNamesEnum.ToList();
         }
 
         #endregion
@@ -190,23 +181,7 @@ namespace Core.ArcObjects
 
             IEnumBSTR modelNamesEnum = modelNameManager.FieldModelNames(pClass, pField);
 
-            List<string> modelNames = new List<string>();
-            string modelName = modelNamesEnum.Next();
-
-            try
-            {
-                while (!String.IsNullOrEmpty(modelName))
-                {
-                    modelNames.Add(modelName);
-                    modelName = modelNamesEnum.Next();
-                }
-            }
-            catch (Exception ex)
-            {
-                //Iteration Over
-            }
-
-            return modelNames;
+            return modelNamesEnum.ToList();
         }
 
         #endregion

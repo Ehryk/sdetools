@@ -1,11 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using log4net;
 using ESRI.ArcGIS.Geodatabase;
 
 namespace Core.ArcObjects
 {
-    public static class DomainHelper
+    public static class DomainExtensions
     {
+        #region Private Properties
+
+        private static readonly ILog _log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        #endregion
+
+        #region IWorkspace Extensions
+
         public static IDomain GetDomain(this IWorkspace workspace, string name)
         {
             IWorkspaceDomains workspaceDomains = (IWorkspaceDomains)workspace;
@@ -28,6 +37,10 @@ namespace Core.ArcObjects
             ICodedValueDomain2 codedValueDomain = (ICodedValueDomain2)domain;
             return codedValueDomain;
         }
+
+        #endregion
+
+        #region ICodedValueDomain Extensions
 
         public static bool HasCode(this ICodedValueDomain pDomain, string pCode, bool pIgnoreCase = false)
         {
@@ -65,27 +78,6 @@ namespace Core.ArcObjects
             return pDomain.HasCode(pCode);
         }
 
-        public static bool OrderCodedValue(this ICodedValueDomain2 pDomain, bool pByValue = true, bool pDescending = false, bool pLockSchema = true)
-        {
-            if (pDomain is null)
-                throw new ArgumentException("pDomain");
-            
-            ISchemaLock schemaLock = (ISchemaLock)pDomain;
-
-            if (pLockSchema)
-                schemaLock.ChangeSchemaLock(esriSchemaLock.esriExclusiveSchemaLock);
-
-            if (pByValue)
-                (pDomain).SortByValue(pDescending);
-            else
-                (pDomain).SortByName(pDescending);
-
-            if (pLockSchema)
-                schemaLock.ChangeSchemaLock(esriSchemaLock.esriSharedSchemaLock);
-
-            return true;
-        }
-
         public static Dictionary<string, string> ListCodedValues(this ICodedValueDomain pDomain)
         {
             if (pDomain is null)
@@ -121,5 +113,32 @@ namespace Core.ArcObjects
 
             return !pDomain.HasCode(pCode);
         }
+
+        #endregion
+
+        #region ICodedValueDomain2 Extensions
+
+        public static bool OrderCodedValue(this ICodedValueDomain2 pDomain, bool pByValue = true, bool pDescending = false, bool pLockSchema = true)
+        {
+            if (pDomain is null)
+                throw new ArgumentException("pDomain");
+            
+            ISchemaLock schemaLock = (ISchemaLock)pDomain;
+
+            if (pLockSchema)
+                schemaLock.ChangeSchemaLock(esriSchemaLock.esriExclusiveSchemaLock);
+
+            if (pByValue)
+                (pDomain).SortByValue(pDescending);
+            else
+                (pDomain).SortByName(pDescending);
+
+            if (pLockSchema)
+                schemaLock.ChangeSchemaLock(esriSchemaLock.esriSharedSchemaLock);
+
+            return true;
+        }
+
+        #endregion
     }
 }
