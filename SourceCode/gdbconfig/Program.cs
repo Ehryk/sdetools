@@ -33,7 +33,8 @@ namespace gdbconfig
                 var options = new Options();
                 //log4net.Config.XmlConfigurator.Configure();
 
-                if (Parser.Default.ParseArgumentsStrict(args, options))
+                var parser = new Parser(with => with.CaseSensitive = true);
+                if (parser.ParseArguments(args, options))
                 {
                     // Values are available here
                     pause = options.Pause;
@@ -50,14 +51,20 @@ namespace gdbconfig
                             Console.Write("{0} v{1}", ApplicationInfo.Title, ApplicationInfo.Version);
                         else
                             Console.WriteLine("{0} v{1}", ApplicationInfo.Title, ApplicationInfo.Version);
+
+                        return SUCCESS;
+                    }
+                    else if (options.Help || args.Any(a => a.Equals("?") || a.Equals("-?") || a.Equals("/?") || a.Equals("/h") || a.Equals("/help") || a.Equals("--?")))
+                    {
+                        //Show Usage/Help and exit
+                        ShowHelp();
                         return SUCCESS;
                     }
 
-                    if (options.InputSDEFile == null)
+                    if (String.IsNullOrWhiteSpace(options.InputSDEFile))
                     {
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.Write(options.GetUsage());
-                        Console.ResetColor();
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("No .sde file provided. Use -h or --help to display usage.");
                         return FAILURE_NO_INPUT;
                     }
 
@@ -65,7 +72,6 @@ namespace gdbconfig
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("File not found: {0}", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, options.InputSDEFile));
-                        Console.ResetColor();
                         return FAILURE_FILE_NOT_FOUND;
                     }
 
@@ -114,7 +120,14 @@ namespace gdbconfig
                         
                         retCode = FAILURE_EXECUTING;
 
-                        if (options.AddDomain)
+                        if (options.Test)
+                        {
+                            Console.ForegroundColor = ConsoleColor.White;
+                            Console.WriteLine("Connection with {0}: Successful", options.InputSDEFile);
+
+                            commandSuccess = true;
+                        }
+                        else if (options.AddDomain)
                         {
                             var domainName = options.Parameter1;
                             var code = options.Parameter2;
@@ -126,8 +139,20 @@ namespace gdbconfig
                                 throw new Exception(String.Format("Domain Not Found: {0}", domainName));
 
                             Console.WriteLine("Adding Domain (Code|Name) ({0}|{1}) to {2}", code, name, domainName);
-                            commandSuccess = domain.AddCodedValue(code, name);
-                            ((IWorkspaceDomains2)workspace).AlterDomain(domain as IDomain);
+
+                            if (domain.HasCode(code))
+                                throw new Exception(String.Format("Domain {0} already has code {1}", domainName, code));
+
+                            if (options.DryRun)
+                            {
+                                Console.WriteLine("(dry run)");
+                                commandSuccess = true;
+                            }
+                            else
+                            {
+                                commandSuccess = domain.AddCodedValue(code, name);
+                                ((IWorkspaceDomains2)workspace).AlterDomain(domain as IDomain);
+                            }
                         }
                         else if (options.OrderDomain)
                         {
@@ -147,7 +172,6 @@ namespace gdbconfig
                             {
                                 case "CODE":
                                 case "VALUE":
-                                case "":
                                 default:
                                     byValue = true;
                                     break;
@@ -170,14 +194,23 @@ namespace gdbconfig
                                     break;
 
                                 case "DSC":
+                                case "DESC":
                                 case "DESCENDING":
                                 case "DOWN":
                                     descending = false;
                                     break;
                             }
 
-                            commandSuccess = domain.OrderCodedValue(byValue, descending);
-                            ((IWorkspaceDomains2)workspace).AlterDomain(domain as IDomain);
+                            if (options.DryRun)
+                            {
+                                Console.WriteLine("(dry run)");
+                                commandSuccess = true;
+                            }
+                            else
+                            {
+                                commandSuccess = domain.OrderCodedValue(byValue, descending);
+                                ((IWorkspaceDomains2)workspace).AlterDomain(domain as IDomain);
+                            }
                         }
                         else if (options.ListDomain)
                         {
@@ -210,8 +243,19 @@ namespace gdbconfig
                             if (domain == null)
                                 throw new Exception(String.Format("Domain Not Found: {0}", domainName));
 
-                            commandSuccess = domain.RemoveCodedValue(code);
-                            ((IWorkspaceDomains2)workspace).AlterDomain(domain as IDomain);
+                            if (!domain.HasCode(code))
+                                throw new Exception(String.Format("Domain {0} does not have code {1}", domainName, code));
+
+                            if (options.DryRun)
+                            {
+                                Console.WriteLine("(dry run)");
+                                commandSuccess = true;
+                            }
+                            else
+                            {
+                                commandSuccess = domain.RemoveCodedValue(code);
+                                ((IWorkspaceDomains2)workspace).AlterDomain(domain as IDomain);
+                            }
                         }
                         else if (options.AddClassModelName)
                         {
@@ -225,7 +269,18 @@ namespace gdbconfig
                             if (objectClass == null)
                                 throw new Exception(String.Format("Class Not Found: {0}", className));
 
-                            commandSuccess = objectClass.AddClassModelName(modelName);
+                            if (objectClass.HasModelName(modelName))
+                                throw new Exception(String.Format("Class {0} already has class model name {1} assigned", className, modelName));
+
+                            if (options.DryRun)
+                            {
+                                Console.WriteLine("(dry run)");
+                                commandSuccess = true;
+                            }
+                            else
+                            {
+                                commandSuccess = objectClass.AddClassModelName(modelName);
+                            }
                         }
                         else if (options.ListClassModelNames)
                         {
@@ -255,7 +310,18 @@ namespace gdbconfig
 
                             IObjectClass objectClass = workspace.GetObjectClass(className);
 
-                            commandSuccess = objectClass.RemoveClassModelName(modelName);
+                            if (!objectClass.HasModelName(modelName))
+                                throw new Exception(String.Format("Class {0} does not have a class model name {1} to remove", className, modelName));
+
+                            if (options.DryRun)
+                            {
+                                Console.WriteLine("(dry run)");
+                                commandSuccess = true;
+                            }
+                            else
+                            {
+                                commandSuccess = objectClass.RemoveClassModelName(modelName);
+                            }
                         }
                         else if (options.AddFieldModelName)
                         {
@@ -273,7 +339,18 @@ namespace gdbconfig
                             if (objectClass == null)
                                 throw new Exception(String.Format("Field {0} Not Found on Class {1}", fieldName, className));
 
-                            commandSuccess = objectClass.AddFieldModelName(field, modelName);
+                            if (objectClass.HasFieldModelName(field, modelName))
+                                throw new Exception(String.Format("Field {0}.{1} already has field model name {2} attached", className, fieldName, modelName));
+
+                            if (options.DryRun)
+                            {
+                                Console.WriteLine("(dry run)");
+                                commandSuccess = true;
+                            }
+                            else
+                            {
+                                commandSuccess = objectClass.AddFieldModelName(field, modelName);
+                            }
                         }
                         else if (options.ListFieldModelNames)
                         {
@@ -314,7 +391,23 @@ namespace gdbconfig
                             if (objectClass == null)
                                 throw new Exception(String.Format("Field {0} Not Found on Class {1}", fieldName, className));
 
-                            commandSuccess = objectClass.RemoveFieldModelName(field, modelName);
+                            if (!objectClass.HasFieldModelName(field, modelName))
+                                throw new Exception(String.Format("Field {0}.{1} does not have a field model name {2} to remove", className, fieldName, modelName));
+
+                            if (options.DryRun)
+                            {
+                                Console.WriteLine("(dry run)");
+                                commandSuccess = true;
+                            }
+                            else
+                            {
+                                commandSuccess = objectClass.RemoveFieldModelName(field, modelName);
+                            }
+                        }
+                        else
+                        {
+                            retCode = FAILURE_ARGUMENTS;
+                            commandSuccess = true;
                         }
 
                         Console.ForegroundColor = ConsoleColor.White;
@@ -365,7 +458,7 @@ namespace gdbconfig
                 else
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Could not parse arguments.");
+                    Console.WriteLine("Could not parse arguments. Use -h or --help to display usage.");
                 }
             }
             catch (Exception e)
@@ -390,6 +483,44 @@ namespace gdbconfig
             }
 
             return retCode;
+        }
+        
+        public static void ShowHelp()
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine(" === {0} v{1}.{2} ===", ApplicationInfo.Title, ApplicationInfo.Version.Major, ApplicationInfo.Version.Minor);
+            Console.ResetColor();
+
+            Console.WriteLine("Performs configuration tasks against an ESRI geodatabase");
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("Usage and Examples: ");
+            Console.ResetColor();
+            Console.WriteLine(" > gdbconfig.exe -h");
+            Console.WriteLine(" > gdbconfig --test -i=connection.sde");
+            Console.WriteLine(" > gdbconfig gdb.sde --add-domain Domain Value [Name]");
+            Console.WriteLine(" > gdbconfig gdb.sde --list-domain Domain");
+            Console.WriteLine(" > gdbconfig gdb.sde --order-domain Domain [VALUE|Name] [ASC|DESC]");
+            Console.WriteLine(" > gdbconfig gdb.sde --remove-domain Domain Value");
+            Console.WriteLine(" > gdbconfig gdb.sde --add-class-model-name ClassName ModelName");
+            Console.WriteLine(" > gdbconfig gdb.sde --list-class-model-name ClassName");
+            Console.WriteLine(" > gdbconfig gdb.sde --remove-class-model-name ClassName ModelName");
+            Console.WriteLine(" > gdbconfig gdb.sde --add-field-model-name ClassName FieldName ModelName");
+            Console.WriteLine(" > gdbconfig gdb.sde --list-field-model-name ClassName FieldName");
+            Console.WriteLine(" > gdbconfig gdb.sde --remove-field-model-name ClassName FieldName ModelName");
+            Console.WriteLine(" > gdbconfig --dry-run -p1 Domain -p2 Value -p3 Name --input connection.sde -Vp");
+            Console.WriteLine(" > gdbconfig [? | /? | -? | -h | --help | --version]");
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("Options");
+            Console.ResetColor();
+            Console.WriteLine(" -i/--input     : Path to an .sde file for connection to an ESRI geodatabse");
+            Console.WriteLine(" -t/--test      : Test the connnection and exit");
+            Console.WriteLine(" -d/--dry-run   : Perform a dry run without making changes");
+            Console.WriteLine(" -v/--version   : Report the version and exit");
+            Console.WriteLine(" -V/--verbose   : Add additional output");
+            Console.WriteLine(" -n/--nonewline : Output without trailing newline");
+            Console.WriteLine(" -p/--pause     : Pause before exiting");
         }
     }
 }

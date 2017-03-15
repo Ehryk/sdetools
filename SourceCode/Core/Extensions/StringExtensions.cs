@@ -96,6 +96,26 @@ namespace Core.Extensions
 
         public static bool? ToNullableBoolean(this string s)
         {
+            if (String.IsNullOrWhiteSpace(s))
+                return null;
+
+            switch (s.ToUpper())
+            {
+                case "TRUE":
+                case "YES":
+                case "Y":
+                case "1":
+                case "T":
+                    return true;
+
+                case "FALSE":
+                case "NO":
+                case "N":
+                case "0":
+                case "F":
+                    return false;
+            }
+
             return Boolean.TryParse(s, out bool b) ? b : (bool?)null;
         }
     }

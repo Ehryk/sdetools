@@ -7,15 +7,27 @@ namespace gdbconfig
     // Class to receive parsed values
     public class Options
     {
-        #region Command Line Options
-
+        #region Input
+        
         [ValueOption(0)]
         [Option('i', "input", Required = false, HelpText = "Input .sde file for connection")]
         public string InputSDEFile { get; set; }
 
+        [ValueOption(1)]
+        [Option("p1", Required = false)]
+        public string Parameter1 { get; set; }
 
-        [Option("version", DefaultValue = false, HelpText = "Display Version and Exit")]
-        public bool Version { get; set; }
+        [ValueOption(2)]
+        [Option("p2", Required = false)]
+        public string Parameter2 { get; set; }
+
+        [ValueOption(3)]
+        [Option("p3", Required = false)]
+        public string Parameter3 { get; set; }
+
+        #endregion
+
+        #region Commands
 
         [Option("add-domain", DefaultValue = false, HelpText = "Add a Domain value")]
         public bool AddDomain { get; set; }
@@ -32,7 +44,7 @@ namespace gdbconfig
         [Option("add-class-model-name", DefaultValue = false, HelpText = "Add a Class Model Name")]
         public bool AddClassModelName { get; set; }
 
-        [Option("list-class-model-names", DefaultValue = false, HelpText = "List Class Model Names")]
+        [Option("list-class-model-name", DefaultValue = false, HelpText = "List Class Model Names")]
         public bool ListClassModelNames { get; set; }
 
         [Option("remove-class-model-name", DefaultValue = false, HelpText = "Remove a Class Model Name")]
@@ -41,33 +53,26 @@ namespace gdbconfig
         [Option("add-field-model-name", DefaultValue = false, HelpText = "Add a Field Model Name")]
         public bool AddFieldModelName { get; set; }
 
-        [Option("list-field-model-names", DefaultValue = false, HelpText = "List Field Model Names")]
+        [Option("list-field-model-name", DefaultValue = false, HelpText = "List Field Model Names")]
         public bool ListFieldModelNames { get; set; }
 
         [Option("remove-field-model-name", DefaultValue = false, HelpText = "Remove a Field Model Name")]
         public bool RemoveFieldModelName { get; set; }
 
         #endregion
-
-        #region Parameters
-
-        [ValueOption(1)]
-        [Option("p1", Required = false, HelpText = "Parameter 1")]
-        public string Parameter1 { get; set; }
-
-        [ValueOption(2)]
-        [Option("p2", Required = false, HelpText = "Parameter 2")]
-        public string Parameter2 { get; set; }
-
-        [ValueOption(3)]
-        [Option("p3", Required = false, HelpText = "Parameter 3")]
-        public string Parameter3 { get; set; }
-
-        #endregion
-
+        
         #region Modifiers
 
-        [Option('v', "verbose", DefaultValue = false, HelpText = "Prints all messages to standard output.")]
+        [Option('v', "version", DefaultValue = false, HelpText = "Display Version and Exit")]
+        public bool Version { get; set; }
+
+        [Option('h', "help", DefaultValue = false, HelpText = "Show Help and Usage")]
+        public bool Help { get; set; }
+
+        [Option('t', "test", DefaultValue = false, HelpText = "Test Connection and Exit")]
+        public bool Test { get; set; }
+
+        [Option('V', "verbose", DefaultValue = false, HelpText = "Prints all messages to standard output.")]
         public bool Verbose { get; set; }
 
         [Option('d', "dry-run", DefaultValue = false, HelpText = "Connects and validates, but does not perform any modifications.")]
@@ -85,7 +90,7 @@ namespace gdbconfig
 
         public bool EsriLicenseRequired
         {
-            get { return AddDomain || OrderDomain || ListDomain || OrderDomain || RemoveDomain || AddClassModelName || AddFieldModelName || ListClassModelNames || ListFieldModelNames || RemoveClassModelName || RemoveFieldModelName; }
+            get { return Test || AddDomain || OrderDomain || ListDomain || OrderDomain || RemoveDomain || AddClassModelName || AddFieldModelName || ListClassModelNames || ListFieldModelNames || RemoveClassModelName || RemoveFieldModelName; }
         }
 
         public bool ArcFMLicenseRequired
@@ -103,10 +108,26 @@ namespace gdbconfig
         //[HelpOption]
         public string GetUsage()
         {
+            //return HelpText.AutoBuild(this, (current) => { });
             string helpText = HelpText.AutoBuild(this,
               (HelpText current) => HelpText.DefaultParsingErrorsHandler(this, current));
-            helpText += "  Example: sde2string Sample.sde -lv \r\n";
+            helpText += "  Example: gdbconfig Sample.sde -add-domain \"Domain Name\" \"Value\" \"Name\" \r\n";
             return helpText;
+        }
+
+        #endregion
+
+        #region Parsers
+
+        public static Options Default
+        {
+            get
+            {
+                Options defaults = new Options();
+                var settings = new ParserSettings(true, true);
+                var parser = new Parser(with => with.CaseSensitive = true);
+                return defaults;
+            }
         }
 
         #endregion
