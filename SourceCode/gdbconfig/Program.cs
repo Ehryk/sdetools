@@ -137,23 +137,33 @@ namespace gdbconfig
                             ICodedValueDomain domain = DomainExtensions.GetCodedValueDomain(workspace, domainName);
 
                             if (domain == null)
-                                throw new Exception(String.Format("Domain Not Found: {0}", domainName));
+                                throw new Exception(String.Format("Domain Not Found: '{0}'", domainName));
 
                             if (domain.HasCode(code))
-                                throw new Exception(String.Format("Domain {0} already has code {1}", domainName, code));
+                                throw new Exception(String.Format("Domain '{0}' already has code '{1}'", domainName, code));
 
-                            Console.WriteLine("Adding Domain (Code|Name) ({0}|{1}) to {2}", code, name, domainName);
+                            Console.WriteLine("Adding Domain (Code|Name) ({0}|{1}) to '{2}'", code, name, domainName);
                             CheckPause(pause, ConsoleColor.White);
 
                             if (options.DryRun)
                             {
+                                Console.ForegroundColor = ConsoleColor.DarkMagenta;
                                 Console.WriteLine("(dry run)");
+                                Console.ForegroundColor = ConsoleColor.White;
                                 commandSuccess = true;
                             }
                             else
                             {
                                 commandSuccess = domain.AddCodedValue(code, name);
                                 ((IWorkspaceDomains2)workspace).AlterDomain(domain as IDomain);
+                            }
+
+                            if (options.List)
+                            {
+                                foreach (var result in domain.ListCodedValues())
+                                {
+                                    Console.WriteLine(" - {0} = {1}", result.Key, result.Value);
+                                }
                             }
                         }
                         else if (options.OrderDomain)
@@ -199,20 +209,30 @@ namespace gdbconfig
                             ICodedValueDomain2 domain = DomainExtensions.GetCodedValueDomain2(workspace, domainName);
 
                             if (domain == null)
-                                throw new Exception(String.Format("Domain Not Found: {0}", domainName));
+                                throw new Exception(String.Format("Domain Not Found: '{0}'", domainName));
 
-                            Console.WriteLine("Ordering Domain {0} by {1}, {2}", domainName, byValue ? "Value" : "Name", descending ? "descending" : "ascending");
+                            Console.WriteLine("Ordering Domain '{0}' by {1}, {2}", domainName, byValue ? "Value" : "Name", descending ? "descending" : "ascending");
                             CheckPause(pause, ConsoleColor.White);
 
                             if (options.DryRun)
                             {
+                                Console.ForegroundColor = ConsoleColor.DarkMagenta;
                                 Console.WriteLine("(dry run)");
+                                Console.ForegroundColor = ConsoleColor.White;
                                 commandSuccess = true;
                             }
                             else
                             {
                                 commandSuccess = domain.OrderCodedValue(byValue, descending);
                                 ((IWorkspaceDomains2)workspace).AlterDomain(domain as IDomain);
+                            }
+
+                            if (options.List)
+                            {
+                                foreach (var result in domain.ListCodedValues())
+                                {
+                                    Console.WriteLine(" - {0} = {1}", result.Key, result.Value);
+                                }
                             }
                         }
                         else if (options.ListDomain)
@@ -222,10 +242,10 @@ namespace gdbconfig
                             ICodedValueDomain domain = DomainExtensions.GetCodedValueDomain(workspace, domainName);
 
                             if (domain == null)
-                                throw new Exception(String.Format("Domain Not Found: {0}", domainName));
+                                throw new Exception(String.Format("Domain Not Found: '{0}'", domainName));
 
-                            Console.WriteLine("Listing Domain {0}:", domainName);
-                            CheckPause(pause, ConsoleColor.White);
+                            Console.WriteLine("Listing Domain '{0}':", domainName);
+                            Console.ForegroundColor = ConsoleColor.White;
 
                             foreach (var code in domain.ListCodedValues())
                             {
@@ -242,17 +262,19 @@ namespace gdbconfig
                             ICodedValueDomain domain = DomainExtensions.GetCodedValueDomain(workspace, domainName);
 
                             if (domain == null)
-                                throw new Exception(String.Format("Domain Not Found: {0}", domainName));
+                                throw new Exception(String.Format("Domain Not Found: '{0}'", domainName));
 
                             if (!domain.HasCode(code))
-                                throw new Exception(String.Format("Domain {0} does not have code {1}", domainName, code));
+                                throw new Exception(String.Format("Domain '{0}' does not have code '{1}'", domainName, code));
 
-                            Console.WriteLine("Removing Domain (CODE) ({0}) from {1}", code, domainName);
+                            Console.WriteLine("Removing Domain (CODE) ({0}) from '{1}'", code, domainName);
                             CheckPause(pause, ConsoleColor.White);
 
                             if (options.DryRun)
                             {
+                                Console.ForegroundColor = ConsoleColor.DarkMagenta;
                                 Console.WriteLine("(dry run)");
+                                Console.ForegroundColor = ConsoleColor.White;
                                 commandSuccess = true;
                             }
                             else
@@ -260,11 +282,19 @@ namespace gdbconfig
                                 commandSuccess = domain.RemoveCodedValue(code);
                                 ((IWorkspaceDomains2)workspace).AlterDomain(domain as IDomain);
                             }
+
+                            if (options.List)
+                            {
+                                foreach (var result in domain.ListCodedValues())
+                                {
+                                    Console.WriteLine(" - {0} = {1}", result.Key, result.Value);
+                                }
+                            }
                         }
                         else if (options.AddClassModelName)
                         {
                             var className = options.Parameter1;
-                            var modelName = options.Parameter2;
+                            var modelName = options.Parameter2.ToUpper();
 
                             IObjectClass objectClass = workspace.GetObjectClass(className);
 
@@ -272,19 +302,29 @@ namespace gdbconfig
                                 throw new Exception(String.Format("Class Not Found: {0}", className));
 
                             if (objectClass.HasModelName(modelName))
-                                throw new Exception(String.Format("Class {0} already has class model name {1} assigned", className, modelName));
+                                throw new Exception(String.Format("Class {0} already has class model name '{1}' assigned", className, modelName));
 
-                            Console.WriteLine("Adding Class Model Name {0} to {1}", modelName, className);
+                            Console.WriteLine("Adding Class Model Name '{0}' to {1}", modelName, className);
                             CheckPause(pause, ConsoleColor.White);
 
                             if (options.DryRun)
                             {
+                                Console.ForegroundColor = ConsoleColor.DarkMagenta;
                                 Console.WriteLine("(dry run)");
+                                Console.ForegroundColor = ConsoleColor.White;
                                 commandSuccess = true;
                             }
                             else
                             {
                                 commandSuccess = objectClass.AddClassModelName(modelName);
+                            }
+
+                            if (options.List)
+                            {
+                                foreach (var name in objectClass.ListModelNames())
+                                {
+                                    Console.WriteLine(" - {0}", name);
+                                }
                             }
                         }
                         else if (options.ListClassModelNames)
@@ -297,11 +337,11 @@ namespace gdbconfig
                                 throw new Exception(String.Format("Class Not Found: {0}", className));
 
                             Console.WriteLine("Listing Class Model Names on {0}:", className);
-                            CheckPause(pause, ConsoleColor.White);
+                            Console.ForegroundColor = ConsoleColor.White;
 
-                            foreach (var code in objectClass.ListModelNames())
+                            foreach (var name in objectClass.ListModelNames())
                             {
-                                Console.WriteLine(" - {0}", code);
+                                Console.WriteLine(" - {0}", name);
                             }
 
                             commandSuccess = true;
@@ -309,7 +349,7 @@ namespace gdbconfig
                         else if (options.RemoveClassModelName)
                         {
                             var className = options.Parameter1;
-                            var modelName = options.Parameter2;
+                            var modelName = options.Parameter2.ToUpper();
 
                             IObjectClass objectClass = workspace.GetObjectClass(className);
 
@@ -317,26 +357,36 @@ namespace gdbconfig
                                 throw new Exception(String.Format("Class Not Found: {0}", className));
 
                             if (!objectClass.HasModelName(modelName))
-                                throw new Exception(String.Format("Class {0} does not have a class model name {1} to remove", className, modelName));
+                                throw new Exception(String.Format("Class {0} does not have a class model name '{1}' to remove", className, modelName));
 
-                            Console.WriteLine("Removing Class Model Name {0} from {1}", modelName, className);
+                            Console.WriteLine("Removing Class Model Name '{0}' from {1}", modelName, className);
                             CheckPause(pause, ConsoleColor.White);
 
                             if (options.DryRun)
                             {
+                                Console.ForegroundColor = ConsoleColor.DarkMagenta;
                                 Console.WriteLine("(dry run)");
+                                Console.ForegroundColor = ConsoleColor.White;
                                 commandSuccess = true;
                             }
                             else
                             {
                                 commandSuccess = objectClass.RemoveClassModelName(modelName);
                             }
+
+                            if (options.List)
+                            {
+                                foreach (var name in objectClass.ListModelNames())
+                                {
+                                    Console.WriteLine(" - {0}", name);
+                                }
+                            }
                         }
                         else if (options.AddFieldModelName)
                         {
                             var className = options.Parameter1;
                             var fieldName = options.Parameter2;
-                            var modelName = options.Parameter3;
+                            var modelName = options.Parameter3.ToUpper();
                             
                             IObjectClass objectClass = workspace.GetObjectClass(className);
                             if (objectClass == null)
@@ -347,19 +397,29 @@ namespace gdbconfig
                                 throw new Exception(String.Format("Field {0} Not Found on Class {1}", fieldName, className));
 
                             if (objectClass.HasFieldModelName(field, modelName))
-                                throw new Exception(String.Format("Field {0}.{1} already has field model name {2} attached", className, fieldName, modelName));
+                                throw new Exception(String.Format("Field {0}.{1} already has field model name '{2}' attached", className, fieldName, modelName));
 
-                            Console.WriteLine("Adding Field Model Name {0} to {1}.{2}", modelName, className, fieldName);
+                            Console.WriteLine("Adding Field Model Name '{0}' to {1}.{2}", modelName, className, fieldName);
                             CheckPause(pause, ConsoleColor.White);
 
                             if (options.DryRun)
                             {
+                                Console.ForegroundColor = ConsoleColor.DarkMagenta;
                                 Console.WriteLine("(dry run)");
+                                Console.ForegroundColor = ConsoleColor.White;
                                 commandSuccess = true;
                             }
                             else
                             {
                                 commandSuccess = objectClass.AddFieldModelName(field, modelName);
+                            }
+
+                            if (options.List)
+                            {
+                                foreach (var name in objectClass.ListFieldModelNames(field))
+                                {
+                                    Console.WriteLine(" - {0}", name);
+                                }
                             }
                         }
                         else if (options.ListFieldModelNames)
@@ -376,11 +436,11 @@ namespace gdbconfig
                                 throw new Exception(String.Format("Field {0} Not Found on Class {1}", fieldName, className));
 
                             Console.WriteLine("Listing Class Model Names on {0}:", className);
-                            CheckPause(pause, ConsoleColor.White);
+                            Console.ForegroundColor = ConsoleColor.White;
 
-                            foreach (var code in objectClass.ListFieldModelNames(field))
+                            foreach (var name in objectClass.ListFieldModelNames(field))
                             {
-                                Console.WriteLine(" - {0}", code);
+                                Console.WriteLine(" - {0}", name);
                             }
 
                             commandSuccess = true;
@@ -389,7 +449,7 @@ namespace gdbconfig
                         {
                             var className = options.Parameter1;
                             var fieldName = options.Parameter2;
-                            var modelName = options.Parameter3;
+                            var modelName = options.Parameter3.ToUpper();
                             
                             IObjectClass objectClass = workspace.GetObjectClass(className);
                             if (objectClass == null)
@@ -400,19 +460,29 @@ namespace gdbconfig
                                 throw new Exception(String.Format("Field {0} Not Found on Class {1}", fieldName, className));
 
                             if (!objectClass.HasFieldModelName(field, modelName))
-                                throw new Exception(String.Format("Field {0}.{1} does not have a field model name {2} to remove", className, fieldName, modelName));
+                                throw new Exception(String.Format("Field {0}.{1} does not have a field model name '{2}' to remove", className, fieldName, modelName));
 
-                            Console.WriteLine("Removing Field Model Name {0} from {1}.{2}", modelName, className, fieldName);
+                            Console.WriteLine("Removing Field Model Name '{0}' from {1}.{2}", modelName, className, fieldName);
                             CheckPause(pause, ConsoleColor.White);
 
                             if (options.DryRun)
                             {
+                                Console.ForegroundColor = ConsoleColor.DarkMagenta;
                                 Console.WriteLine("(dry run)");
+                                Console.ForegroundColor = ConsoleColor.White;
                                 commandSuccess = true;
                             }
                             else
                             {
                                 commandSuccess = objectClass.RemoveFieldModelName(field, modelName);
+                            }
+
+                            if (options.List)
+                            {
+                                foreach (var name in objectClass.ListFieldModelNames(field))
+                                {
+                                    Console.WriteLine(" - {0}", name);
+                                }
                             }
                         }
                         else

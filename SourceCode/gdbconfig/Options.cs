@@ -77,9 +77,12 @@ namespace gdbconfig
 
         [Option('d', "dry-run", DefaultValue = false, HelpText = "Connects and validates, but does not perform any modifications.")]
         public bool DryRun { get; set; }
-        
+
         [Option('p', "pause", DefaultValue = false, HelpText = "Pause for a key press before terminating.")]
         public bool Pause { get; set; }
+
+        [Option('l', "list", DefaultValue = false, HelpText = "List resulting values after modification.")]
+        public bool List { get; set; }
 
         [Option('n', "newline", DefaultValue = false, HelpText = "Do not output the trailing newline.")]
         public bool Newline { get; set; }
