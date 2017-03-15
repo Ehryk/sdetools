@@ -610,6 +610,7 @@ namespace gdbconfig
             Console.WriteLine(" -v/--version   : Report the version and exit");
             Console.WriteLine(" -V/--verbose   : Add additional output");
             Console.WriteLine(" -n/--nonewline : Output without trailing newline");
+            Console.WriteLine(" -l/--list      : List result after command execution");
             Console.WriteLine(" -p/--pause     : Pause before exiting");
         }
     }
