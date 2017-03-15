@@ -27,6 +27,7 @@ namespace gdbconfig
         {
             int retCode = FAILURE_UNSPECIFIED;
             bool pause = false;
+            bool verbose = false;
 
             try
             {
@@ -38,6 +39,7 @@ namespace gdbconfig
                 {
                     // Values are available here
                     pause = options.Pause;
+                    verbose = options.Verbose;
 
 #if DEBUG
                     Console.ForegroundColor = ConsoleColor.Cyan;
@@ -520,10 +522,12 @@ namespace gdbconfig
 
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("{0}: {1}", exceptionType, e.Message);
-#if DEBUG
-                        Console.WriteLine();
-                        Console.WriteLine("Stack Trace: {0}", e.StackTrace);
-#endif
+
+                        if (verbose)
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine("Stack Trace: {0}", e.StackTrace);
+                        }
                     }
                     finally
                     {
@@ -546,10 +550,12 @@ namespace gdbconfig
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Exception: {0}", e.Message);
-#if DEBUG
-                Console.WriteLine();
-                Console.WriteLine("Stack Trace: {0}", e.StackTrace);
-#endif
+
+                if (verbose)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("Stack Trace: {0}", e.StackTrace);
+                }
             }
             finally
             {
