@@ -136,7 +136,7 @@ namespace gdbconfig
                             var code = options.Parameter2;
                             var name = options.Parameter3 ?? options.Parameter2;
 
-                            ICodedValueDomain domain = DomainExtensions.GetCodedValueDomain(workspace, domainName);
+                            ICodedValueDomain domain = workspace.GetCodedValueDomain(domainName);
 
                             if (domain == null)
                                 throw new Exception(String.Format("Domain Not Found: '{0}'", domainName));
@@ -208,7 +208,7 @@ namespace gdbconfig
                                     break;
                             }
 
-                            ICodedValueDomain2 domain = DomainExtensions.GetCodedValueDomain2(workspace, domainName);
+                            ICodedValueDomain2 domain = workspace.GetCodedValueDomain2(domainName);
 
                             if (domain == null)
                                 throw new Exception(String.Format("Domain Not Found: '{0}'", domainName));
@@ -241,7 +241,7 @@ namespace gdbconfig
                         {
                             var domainName = options.Parameter1;
 
-                            ICodedValueDomain domain = DomainExtensions.GetCodedValueDomain(workspace, domainName);
+                            ICodedValueDomain domain = workspace.GetCodedValueDomain(domainName);
 
                             if (domain == null)
                                 throw new Exception(String.Format("Domain Not Found: '{0}'", domainName));
@@ -261,7 +261,7 @@ namespace gdbconfig
                             var domainName = options.Parameter1;
                             var code = options.Parameter2;
 
-                            ICodedValueDomain domain = DomainExtensions.GetCodedValueDomain(workspace, domainName);
+                            ICodedValueDomain domain = workspace.GetCodedValueDomain(domainName);
 
                             if (domain == null)
                                 throw new Exception(String.Format("Domain Not Found: '{0}'", domainName));

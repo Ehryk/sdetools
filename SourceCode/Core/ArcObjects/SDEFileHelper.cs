@@ -35,6 +35,11 @@ namespace Core.ArcObjects
             return WorkspaceFromSDEFile(pPath);
         }
 
+        public static IWorkspace GetWorkspaceFromSDEFile(string pPath, string pFeatureClass)
+        {
+            return WorkspaceFromSDEFile_FeatureClass(pPath, pFeatureClass);
+        }
+
         public static IFeatureWorkspace GetFeatureWorkspaceFromSDEFile(string pPath)
         {
             return FeatureWorkspaceFromSDEFile(pPath);
@@ -70,6 +75,27 @@ namespace Core.ArcObjects
         {
             SdeWorkspaceFactory pWSFactory = new SdeWorkspaceFactory();
             IWorkspace pWSpace = pWSFactory.OpenFromFile(pPath, 0);
+
+            return pWSpace;
+        }
+
+        private static IWorkspace WorkspaceFromSDEFile_FeatureClass(string pPath, string pFeatureClass)
+        {
+            SdeWorkspaceFactory wsFactory = new SdeWorkspaceFactory();
+            IWorkspace ws = wsFactory.OpenFromFile(pPath, 0);
+
+            IFeatureClass feature = (IFeatureClass)ws.GetObjectClass(pFeatureClass);
+            ws = ((IDataset)feature).Workspace;
+
+            return ws;
+        }
+
+        private static IWorkspace WorkspaceFromSDEFile_IWorkspaceFactory2(string pPath)
+        {
+            Type factoryType = Type.GetTypeFromProgID("esriDataSourcesGDB.SdeWorkspaceFactory");
+            IWorkspaceFactory2 workspaceFactory2 = (IWorkspaceFactory2)Activator.CreateInstance(factoryType);
+
+            IWorkspace pWSpace = workspaceFactory2.OpenFromFile(pPath, 0);
 
             return pWSpace;
         }

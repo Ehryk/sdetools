@@ -32,10 +32,11 @@ namespace Core.ArcObjects
 
         public static ICodedValueDomain2 GetCodedValueDomain2(this IWorkspace pWorkspace, string pName)
         {
-            IWorkspaceDomains2 workspaceDomains = (IWorkspaceDomains2)pWorkspace;
+            IWorkspaceDomains workspaceDomains = (IWorkspaceDomains)pWorkspace;
             IDomain domain = workspaceDomains.DomainByName[pName];
-            ICodedValueDomain2 codedValueDomain = (ICodedValueDomain2)domain;
-            return codedValueDomain;
+            ICodedValueDomain codedValueDomain = (ICodedValueDomain)domain;
+            ICodedValueDomain2 codedValueDomain2 = (ICodedValueDomain2)codedValueDomain;
+            return codedValueDomain2;
         }
 
         #endregion
