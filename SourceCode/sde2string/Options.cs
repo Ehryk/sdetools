@@ -13,10 +13,10 @@ namespace sde2string
         [Option('i', "input", Required = false, HelpText = "Input .sde file to be processed.")]
         public string InputFile { get; set; }
 
-        [Option('c', "connect", DefaultValue = false, HelpText = "Establishes the SDE Connection and examines with ESRI libraries.")]
+        [Option('c', "connect", DefaultValue = false, HelpText = "Attempts to establishes a connection and examines result.")]
         public bool Connect { get; set; }
 
-        [Option('v', "verbose", DefaultValue = false, HelpText = "Prints all messages to standard output.")]
+        [Option('V', "verbose", DefaultValue = false, HelpText = "Prints all messages to standard output.")]
         public bool Verbose { get; set; }
 
         [Option('l', "list", DefaultValue = false, HelpText = "Lists each property on a single line.")]
@@ -28,7 +28,7 @@ namespace sde2string
         [Option('p', "pause", DefaultValue = false, HelpText = "Pause for a key press before terminating.")]
         public bool Pause { get; set; }
 
-        [Option('n', "newline", DefaultValue = false, HelpText = "Do not output the trailing newline.")]
+        [Option('n', "no-newline", DefaultValue = false, HelpText = "Do not output the trailing newline.")]
         public bool Newline { get; set; }
 
         [Option('r', "raw", DefaultValue = false, HelpText = "Output the raw (semi-parsed) contents of the .sde file as ascii.")]
@@ -40,7 +40,7 @@ namespace sde2string
         [Option('e', "encoding", DefaultValue = "ASCII", HelpText = "Specify the .sde encoding. May cause errors without -u (unparsed).")]
         public String Encoding { get; set; }
 
-        [Option("version", DefaultValue = false, HelpText = "Display Version and Exit.")]
+        [Option("v", "version", DefaultValue = false, HelpText = "Display Version and Exit.")]
         public bool Version { get; set; }
 
         #endregion

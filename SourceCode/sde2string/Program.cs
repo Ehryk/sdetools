@@ -28,8 +28,10 @@ namespace sde2string
             try
             {
                 var options = new Options();
+                //log4net.Config.XmlConfigurator.Configure();
 
-                if (Parser.Default.ParseArgumentsStrict(args, options))
+                var parser = new Parser(with => { with.CaseSensitive = true; with.MutuallyExclusive = true; });
+                if (parser.ParseArguments(args, options))
                 {
                     // Values are available here
                     pause = options.Pause;
@@ -227,6 +229,45 @@ namespace sde2string
             }
 
             return retCode;
+        }
+
+        public static void ShowHelp()
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine(" === {0} v{1}.{2} ===", ApplicationInfo.Title, ApplicationInfo.Version.Major, ApplicationInfo.Version.Minor);
+            Console.ResetColor();
+
+            Console.WriteLine("Decodes .sde file contents");
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("Usage and Examples: ");
+            Console.ResetColor();
+            Console.WriteLine(" > sde2string.exe -h");
+            Console.WriteLine(" > sde2string -input=connection.sde {Options}");
+            Console.WriteLine(" > sde2string gdb.sde --connect --list");
+            Console.WriteLine(" > sde2string gdb.sde -cl");
+            Console.WriteLine(" > sde2string gdb.sde -clVbpn");
+            Console.WriteLine(" > sde2string -v");
+            Console.WriteLine(" > sde2string --list --connect --input connection.sde -Vp");
+            Console.WriteLine(" > sde2string [? | /? | -? | -h | --help | --version]");
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("Options:");
+            Console.ResetColor();
+            Console.WriteLine(" -i/--input       : Input .sde file to be processed");
+            Console.WriteLine(" -c/--connect     : Attempts to establish a connection and examines result");
+            Console.WriteLine(" -V/--verbose     : Show additional output");
+            Console.WriteLine(" -r/--raw         : Output the raw (semi-parsed) contents of the .sde file as ascii");
+            Console.WriteLine(" -l/--list        : Lists each property on a single line");
+            Console.WriteLine(" -u/--unparsed    : Output the raw (unparsed) contents of the .sde file as ascii");
+            Console.WriteLine(" -b/--bracketless : Display key values without surrounding brackets");
+            Console.WriteLine(" -e/--encoding    : Specify the .sde encoding. May cause errors without -u (unparsed)");
+            Console.WriteLine(" -n/--nonewline   : Output without trailing newline");
+            Console.WriteLine(" -p/--pause       : Pause for a key press before terminating");
+            Console.WriteLine(" -v/--version     : Display Version and Exit");
+            Console.WriteLine(" -h/--help        : Display this help (also ?, -?, /?, or no input)");
+            Console.ResetColor();
+            Console.WriteLine(" Encodings: DEFAULT, ASCII, UTF7, UTF8, UTF16, UTF32");
         }
     }
 }

@@ -617,7 +617,7 @@ namespace gdbconfig
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Options");
             Console.ResetColor();
-            Console.WriteLine(" -i/--input     : Path to an .sde file for connection to an ESRI geodatabse");
+            Console.WriteLine(" -i/--input     : Path to an .sde file for connection to an ESRI geodatabase");
             Console.WriteLine(" -t/--test      : Test the connnection and exit");
             Console.WriteLine(" -d/--dry-run   : Perform a dry run without making changes");
             Console.WriteLine(" -v/--version   : Report the version and exit");
