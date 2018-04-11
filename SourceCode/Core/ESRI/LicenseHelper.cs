@@ -5,7 +5,7 @@ using ESRI.ArcGIS.esriSystem;
 using ESRI.ArcGIS.ADF.COMSupport;
 using Miner.Interop;
 
-namespace Core.ArcObjects
+namespace Core.ESRI
 {
     public static class LicenseHelper
     {

@@ -127,7 +127,7 @@ Thanks to Michael Juvrud for providing sample .NET ArcObjects code snippets and 
 
 ### Contacts:
 
- - Eric Menze
+ - **Eric Menze**
    - [Email](mailto:rhaistlin+gh@gmail.com)
    - [Portfolio](http://ericmenze.com)
    - [Github](https://github.com/Ehryk)

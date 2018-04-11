@@ -1,12 +1,12 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Collections.Generic;
 using log4net;
 using ESRI.ArcGIS.esriSystem;
 
-namespace Core.ArcObjects
+namespace Core.ESRI
 {
-    public static class EsriExtensions
+    public static class Extensions
     {
         #region Private Properties
 
@@ -36,6 +36,26 @@ namespace Core.ArcObjects
             }
 
             return modelNames;
+        }
+
+        #endregion
+
+        #region IObjectClass Retrieval
+
+        #endregion
+
+        #region IField Retrieval
+
+        public static IField GetField(this IObjectClass pObjectClass, string pName)
+        {
+            if (pObjectClass is null)
+                throw new ArgumentException("pObjectClass");
+
+            int index = pObjectClass.FindField(pName);
+            if (index < 0)
+                return null;
+
+            return pObjectClass.Fields.Field[index];
         }
 
         #endregion
